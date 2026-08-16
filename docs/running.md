@@ -142,7 +142,7 @@ backend's `framebuffer` feature renders to memory instead, with no SDL and no
 simulator involved:
 
 ```rust
-use xpui_eg::{Backend, Framebuffer, Palette};
+use xpui_eg::{assert_screenshot, Backend, Framebuffer, Palette};
 
 let backend = Backend::leak(
     Framebuffer::new(480, 800),
@@ -153,8 +153,7 @@ unsafe { xpui::host::install(backend) };
 App::new(MyScreen::new()).render();
 
 backend.with_display(|frame| {
-    frame.write_bmp("my_screen");           // a BMP you can open
-    println!("{}", frame.thumbnail(60));    // an ASCII view small enough to diff
+    assert_screenshot("my_screen", frame);                  // against a committed PNG
     assert!(frame.ink_in(0, 0, 480, 56) > 0, "it has a header");
 });
 ```
@@ -163,15 +162,15 @@ Input goes in the same way the simulator feeds it — `backend.begin_frame(ms)`,
 `backend.press(Button::Confirm)`, `app.tick()` — so a test can press a button and
 render what came back.
 [`examples/gallery/tests/screenshots.rs`](../../../../examples/gallery/tests/screenshots.rs)
-is the worked example: it shoots every gallery screen, compares an ASCII
-thumbnail against a text golden, and writes the BMPs somewhere you can look at
-them.
+is the worked example: it shoots every gallery screen and compares each one
+against a PNG committed in `tests/screenshots/`, pixel for pixel. A mismatch
+writes `target/diff/<name>.png` — expected, actual and the differences, side by
+side.
 
-One trap in a workspace: an integration test's working directory is its own
-crate root, which is *not* where the shared `target/` is. `write_bmp` lands
-relative to the working directory, so a test that wants every shot in one place
-passes `env!("CARGO_TARGET_TMPDIR")` to `write_bmp_in` instead, or sets
-`XPUI_SCREENSHOT_DIR`.
+`frame.write_bmp("name")` and `frame.thumbnail(60)` are still there for looking
+at a frame that has no golden. Nothing compares either of them, so do not pair
+one with a screenshot assertion: two artifacts where only one is authoritative
+is how the other one ends up trusted.
 
 ## When it does not run
 
