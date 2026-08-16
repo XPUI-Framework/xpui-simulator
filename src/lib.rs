@@ -313,4 +313,9 @@ pub fn button_for(key: Keycode) -> Option<Button> {
 mod guides {
     #[doc = include_str!("../README.md")]
     pub mod readme {}
+    /// `tests/keys.rs` also reads this file, but as *data* — it checks the key
+    /// table against `button_for`. Reading is not compiling, and for a while
+    /// that was mistaken for proof while both its Rust blocks went unbuilt.
+    #[doc = include_str!("../docs/running.md")]
+    pub mod running {}
 }

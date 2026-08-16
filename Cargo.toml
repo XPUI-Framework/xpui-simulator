@@ -21,3 +21,9 @@ xpui-chrome.workspace = true
 xpui-embedded-graphics.workspace = true
 embedded-graphics = "0.8"
 embedded-graphics-simulator = "0.8"
+
+[dev-dependencies]
+# The guide shows how to screenshot a screen without a window, and that block
+# is compiled rather than taken on trust.
+xpui = { workspace = true, features = ["testing"] }
+xpui-embedded-graphics = { workspace = true, features = ["framebuffer"] }

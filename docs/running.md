@@ -31,7 +31,15 @@ dialogs, scrolling and text, so a widget that broke shows up in one of them.
 
 Opening a screen of your own instead:
 
-```rust
+```rust,no_run
+# use xpui::{NavigationScreen, Screen, Text, View, vstack};
+# struct MyScreen;
+# impl MyScreen { fn new() -> Self { MyScreen } }
+# impl Screen for MyScreen {
+#     type Message = ();
+#     fn body(&self) -> impl View<()> { NavigationScreen::new(vstack![0; Text::new("hello")]) }
+#     fn update(&mut self, _: ()) {}
+# }
 use xpui_simulator::{Panel, Simulator};
 
 fn main() {
@@ -141,7 +149,17 @@ A window is the wrong tool for asserting on a screen. The `embedded_graphics`
 backend's `framebuffer` feature renders to memory instead, with no SDL and no
 simulator involved:
 
-```rust
+```rust,no_run
+# use embedded_graphics::pixelcolor::BinaryColor;
+# use xpui::App;
+# use xpui::{NavigationScreen, Screen, Text, View, vstack};
+# struct MyScreen;
+# impl MyScreen { fn new() -> Self { MyScreen } }
+# impl Screen for MyScreen {
+#     type Message = ();
+#     fn body(&self) -> impl View<()> { NavigationScreen::new(vstack![0; Text::new("hello")]) }
+#     fn update(&mut self, _: ()) {}
+# }
 use xpui_eg::{assert_screenshot, Backend, Framebuffer, Palette};
 
 let backend = Backend::leak(
