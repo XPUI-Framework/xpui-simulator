@@ -39,7 +39,7 @@ fn a_small_panel_is_scaled_up_and_a_large_one_is_not() {
         "a 296x128 strip at 1:1 is a postage stamp"
     );
     assert_eq!(
-        Panel::of(Board::READER_LANDSCAPE).scale,
+        Panel::of(Board::X4).scale,
         1,
         "an 800x480 panel is already a reasonable window"
     );

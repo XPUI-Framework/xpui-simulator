@@ -35,13 +35,13 @@ Opening a screen of your own instead:
 use xpui_simulator::{Panel, Simulator};
 
 fn main() {
-    Simulator::new(Panel::PORTRAIT).title("my reader").run(MyScreen::new());
+    Simulator::new(Panel::DEFAULT).title("my reader").run(MyScreen::new());
 }
 ```
 
-`Panel::PORTRAIT` is 480 × 800 and `Panel::LANDSCAPE` is 800 × 480, both at 1:1.
+`Panel::DEFAULT` is 480 × 800 and `Panel::DEFAULT` is 800 × 480, both at 1:1.
 A 1-bit panel at 1:1 is hard to read on a high-density display, so
-`Panel::PORTRAIT.scaled(2)` doubles every panel pixel in the window without
+`Panel::DEFAULT.scaled(2)` doubles every panel pixel in the window without
 changing what the screen is laid out against.
 
 ## Boards
@@ -55,8 +55,8 @@ strip is not a postage stamp on a modern display.
 ```bash
 cargo run -p xpui-gallery -- --board badger2040
 cargo run -p xpui-gallery -- --board tufty2040
-cargo run -p xpui-gallery -- --board reader            # the default
-cargo run -p xpui-gallery -- --board reader-landscape
+cargo run -p xpui-gallery -- --board x4            # the default
+cargo run -p xpui-gallery -- --board sticky
 ```
 
 This is worth doing early rather than at the end. A Badger 2040's content band

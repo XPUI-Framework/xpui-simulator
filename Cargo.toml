@@ -16,6 +16,7 @@ crate-type = ["rlib"]
 
 [dependencies]
 xpui.workspace = true
+xpui-boards.workspace = true
 xpui-chrome.workspace = true
 xpui-embedded-graphics.workspace = true
 embedded-graphics = "0.8"

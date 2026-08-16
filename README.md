@@ -15,7 +15,7 @@ developed without hardware.
 use xpui_simulator::{Panel, Simulator};
 
 fn main() {
-    Simulator::new(Panel::PORTRAIT)
+    Simulator::new(Panel::DEFAULT)
         .title("my reader")
         .run(MainMenu::new());
 }

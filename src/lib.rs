@@ -41,7 +41,7 @@ use embedded_graphics_simulator::{
 
 use xpui::screen::Screen;
 use xpui::{App, Button, Point, SwipeDir};
-pub use xpui_chrome::Board;
+pub use xpui_boards::Board;
 use xpui_eg::{Backend, Palette};
 
 /// The panel to simulate.
@@ -61,11 +61,9 @@ pub struct Panel {
 }
 
 impl Panel {
-    /// A portrait e-reader panel, which is what most of these devices are.
-    pub const PORTRAIT: Panel = Panel::of(Board::READER_PORTRAIT);
-
-    /// The same panel on its side.
-    pub const LANDSCAPE: Panel = Panel::of(Board::READER_LANDSCAPE);
+    /// The default when no board is named. A real device rather than a
+    /// placeholder, so what opens is something that exists.
+    pub const DEFAULT: Panel = Panel::of(Board::X4);
 
     /// The panel a [`Board`] has.
     ///
