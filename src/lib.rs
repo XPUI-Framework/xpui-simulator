@@ -21,7 +21,10 @@
 //! | Backspace | `Back` |
 //! | Page Up / Page Down | `PageBack` / `PageForward` |
 //! | H | the home gesture |
-//! | Q | quit |
+//! | Q or Escape | quit |
+//!
+//! Escape cannot be `Back`: `embedded-graphics-simulator` turns it into
+//! `SimulatorEvent::Quit` before [`button_for`] ever sees a key press.
 //!
 //! A click is a tap, a drag reports held positions, and the scroll wheel is a
 //! swipe — so touch behaviour can be exercised without a panel.
@@ -32,7 +35,8 @@ use embedded_graphics::pixelcolor::{BinaryColor, Rgb888};
 pub use embedded_graphics_simulator::sdl2::Keycode;
 use embedded_graphics_simulator::sdl2::MouseButton;
 use embedded_graphics_simulator::{
-    BinaryColorTheme, OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
+    BinaryColorTheme, OutputSettings, OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent,
+    Window,
 };
 
 use xpui::screen::Screen;
@@ -156,22 +160,7 @@ impl Simulator {
         // Safety: one window, one thread, and nothing has rendered yet.
         unsafe { xpui::host::install(backend) };
 
-        let output = OutputSettingsBuilder::new()
-            .scale(self.panel.scale)
-            // Explicit, and load-bearing. `theme()` does `pixel_spacing
-            // .get_or_insert(1)` as a side effect, which puts a gap between
-            // every panel pixel: the window comes out roughly twice the size
-            // it should be, and mouse coordinates arrive halved because the
-            // pitch used to unmap them is `scale + spacing`.
-            .pixel_spacing(0)
-            // Ink on paper rather than pixels on black: these are e-ink
-            // panels, and a white-on-black preview reads as a bug. The default
-            // theme is an identity map, so with ink as `On` it renders white.
-            .theme(BinaryColorTheme::Custom {
-                color_on: Rgb888::new(0x1A, 0x1A, 0x1A),
-                color_off: Rgb888::new(0xF2, 0xF2, 0xEE),
-            })
-            .build();
+        let output = window_settings(self.panel.scale);
         let mut window = Window::new(&self.title, &output);
 
         let mut app = App::new(root);
@@ -275,6 +264,30 @@ impl Simulator {
     }
 }
 
+/// How the window presents one panel pixel.
+///
+/// Out of line so a test can read it back. Inline in the frame loop it was
+/// unreachable, and the one line that matters here was wrong for as long as
+/// nobody could assert on it.
+pub fn window_settings(scale: u32) -> OutputSettings {
+    OutputSettingsBuilder::new()
+        .scale(scale)
+        // Explicit, and load-bearing. `theme()` does
+        // `pixel_spacing.get_or_insert(1)` as a side effect, which puts a gap
+        // between every panel pixel: the window comes out roughly twice the
+        // size it should be, and mouse coordinates arrive halved, because the
+        // pitch used to unmap them is `scale + spacing`.
+        .pixel_spacing(0)
+        // Ink on paper rather than pixels on black: these are e-ink panels,
+        // and a white-on-black preview reads as a bug. The default theme is an
+        // identity map, so with ink as `On` it would render white.
+        .theme(BinaryColorTheme::Custom {
+            color_on: Rgb888::new(0x1A, 0x1A, 0x1A),
+            color_off: Rgb888::new(0xF2, 0xF2, 0xEE),
+        })
+        .build()
+}
+
 /// The keyboard, as logical buttons.
 ///
 /// Named by meaning, never by position: the framework's own contract is that a
@@ -291,4 +304,15 @@ pub fn button_for(key: Keycode) -> Option<Button> {
         Keycode::PageDown => Button::PageForward,
         _ => return None,
     })
+}
+
+/// The crate's prose, compiled.
+///
+/// A README that does not build is worse than none: this crate's only usage
+/// example passed the wrong form to its own macro for as long as nothing
+/// tried it.
+#[cfg(doctest)]
+mod guides {
+    #[doc = include_str!("../README.md")]
+    pub mod readme {}
 }

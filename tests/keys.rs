@@ -45,18 +45,42 @@ fn escape_is_not_back() {
     );
 }
 
+/// The page must say what the code does, in both columns.
+///
+/// Asserting only that a key name appears somewhere leaves the meaning column
+/// free to say anything: the page could claim Backspace is Confirm and still
+/// pass. So each row is found by its key and then read for the button it
+/// promises.
 #[test]
-fn the_page_still_lists_what_the_code_maps() {
+fn the_page_says_what_each_key_does() {
     let page = include_str!("../docs/running.md");
-    for (label, ..) in DOCUMENTED {
+
+    for (label, _, expected) in DOCUMENTED {
+        let Some(button) = expected else { continue };
+
+        let row = page
+            .lines()
+            .filter(|line| line.starts_with('|'))
+            .find(|line| {
+                let key_column = line.split('|').nth(1).unwrap_or_default();
+                key_column.contains(label)
+            })
+            .unwrap_or_else(|| panic!("docs/running.md has no table row for {label}"));
+
+        let meaning = row.split('|').nth(2).unwrap_or_default();
+        let name = format!("Button::{button:?}");
         assert!(
-            page.contains(label),
-            "the key table in docs/running.md no longer mentions {label}"
+            meaning.contains(&name),
+            "docs/running.md says {label} does {meaning:?}, but the code maps \
+             it to {name}"
         );
     }
-    assert!(
-        page.contains("Escape cannot be Back"),
-        "the page must keep explaining why Escape is not Back, or someone will \
-         helpfully add it back"
-    );
+}
+
+/// The reason Escape is not Back has to stay on the page, or someone will
+/// helpfully add it back.
+#[test]
+fn the_page_keeps_explaining_escape() {
+    let page = include_str!("../docs/running.md");
+    assert!(page.contains("Escape cannot be Back"));
 }
