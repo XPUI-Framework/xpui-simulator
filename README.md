@@ -3,7 +3,15 @@
 Runs an [`xpui`](../../xpui/) app in a desktop window, so screens can be
 developed without hardware.
 
-```rust
+```rust,no_run
+# use xpui::{Screen, Text, View};
+# struct MainMenu;
+# impl MainMenu { fn new() -> Self { MainMenu } }
+# impl Screen for MainMenu {
+#     type Message = ();
+#     fn body(&self) -> impl View<()> { Text::new("Main menu") }
+#     fn update(&mut self, _message: ()) {}
+# }
 use xpui_simulator::{Panel, Simulator};
 
 fn main() {
@@ -26,10 +34,14 @@ backend, same components, same measurements.
 | Up / Down | move focus |
 | Left / Right | nudge whatever holds focus |
 | Enter or Space | confirm |
-| Escape or Backspace | back |
+| Backspace | back |
 | Page Up / Page Down | page |
 | H | the home gesture |
-| Q | quit |
+| Q or Escape | quit |
+
+**Escape cannot be Back.** `embedded-graphics-simulator` turns it into
+`SimulatorEvent::Quit` before the event reaches the keyboard map, so there is no
+key press left to interpret. Backspace is Back.
 
 Clicking is a tap, dragging reports held positions, and the scroll wheel is a
 swipe — so the touch paths are exercised too, not just the buttons.

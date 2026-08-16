@@ -70,7 +70,7 @@ chrome that band is 28 pixels and a list draws no rows at all, which is why
 Named by meaning rather than position, because that is the framework's own
 contract: a screen asks for `Confirm` and the host decides what that is.
 
-| Input | |
+| Key | |
 |---|---|
 | Up / Down | `Button::Up` / `Button::Down` — move focus |
 | Left / Right | `Button::Left` / `Button::Right` — nudge whatever holds focus |
@@ -83,8 +83,10 @@ contract: a screen asks for `Confirm` and the host decides what that is.
 **Escape cannot be Back**, however much it ought to be.
 `embedded-graphics-simulator` turns it into `SimulatorEvent::Quit` before the
 event reaches us, so there is no key press left to interpret. Backspace is Back;
-Escape closes the window. This page used to claim otherwise, which is worth
-knowing if you tried it and concluded Back was broken.
+Escape closes the window.
+
+| Mouse | |
+|---|---|
 | Left click | a tap |
 | Left drag | held positions, frame by frame |
 | Scroll wheel | a swipe: wheel up reports `SwipeDir::Down`, wheel down `SwipeDir::Up` |
