@@ -1,0 +1,22 @@
+[package]
+name = "xpui-simulator"
+description = "Runs an xpui app in a desktop window, for developing screens without hardware"
+readme = "README.md"
+keywords = ["ui", "embedded", "eink", "simulator", "xpui"]
+categories = ["development-tools", "gui"]
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+name = "xpui_simulator"
+crate-type = ["rlib"]
+
+[dependencies]
+xpui.workspace = true
+xpui-chrome.workspace = true
+xpui-embedded-graphics.workspace = true
+embedded-graphics = "0.8"
+embedded-graphics-simulator = "0.8"
