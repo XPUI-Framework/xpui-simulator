@@ -98,20 +98,40 @@ Escape closes the window.
 | Mouse | |
 |---|---|
 | Left click on the panel | a tap |
-| Left drag on the panel | held positions, frame by frame |
+| Left drag on the panel | held positions, then a swipe or a gesture on release |
+| Left press, held still | a long press after half a second |
 | Left click on a physical button | presses it, exactly as its key does |
 | Scroll wheel | a swipe: wheel up reports `SwipeDir::Down`, wheel down `SwipeDir::Up` |
 
-So the touch paths are exercised too, not only the buttons.
+## The mouse as a finger
 
-Three details of the mouse are deliberate. A tap is reported at the point the
-button went *down*, not where it came up, which is what the framework expects
-and what stops a slightly shaky click landing on a different control. A release
-that drifted more than eight window pixels from the press is not reported as a
-tap at all — it was a drag, and the drag frames already went through. And a
-click that missed the panel is **never** a touch, whatever it hit: a device
-with no touchscreen has no such coordinate to be touched at, and a simulator
-that invented one would let a screen ship depending on it.
+A click and drag goes through CrossPoint's touch model, ported constant for
+constant from the firmware's `InputManager`, so a gesture that works in this
+window works on the device and one the device would refuse is refused here.
+
+| | |
+|---|---|
+| A tap | up to **59 px** of travel, reported at the point the finger went **down** |
+| A swipe | **60 px** on either axis, within **700 ms**, resolved to its dominant axis |
+| A long press | **500 ms** still, cancelled by **28 px** of movement |
+| Back | a right swipe starting in the left **25%** |
+| Home | an up swipe starting in the bottom **14%** |
+| Menu | a down swipe starting in the top **14%** |
+
+Two of those numbers look like typos and are not. A tap survives 59 px while a
+long press dies at 28, because they answer different questions: one asks
+whether the finger was ever *still*, the other whether it went far enough to
+have meant somewhere else. They were once the same number, and the 29..59 px
+gap that left — where an ordinary finger roll was neither a tap nor a swipe —
+is the reason they are not. A tap is reported where the finger landed for a
+related reason: the contact point drifts 10-20 px as a finger rolls off during
+a lift, and routing the release point makes small targets feel unreliable.
+
+**A click that missed the panel is never a touch**, and neither is a click on a
+board whose `touch` is `false` — a Badger 2040 has no touchscreen, so clicking
+its panel does nothing at all. A device cannot receive a touch at a coordinate
+it has no way of producing, and a simulator that invented one would let a
+screen ship depending on it. Use the keys, or a board that has a touchscreen.
 
 ## The device around the panel
 

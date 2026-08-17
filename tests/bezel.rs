@@ -8,7 +8,7 @@
 
 use xpui::{Button, Point};
 use xpui_boards::{Bezel, Board};
-use xpui_simulator::{BezelLayout, Hit, Panel, Press, route};
+use xpui_simulator::{BezelLayout, Hit, Panel, route};
 
 /// What `MultiWindow` reports for a raw window position.
 ///
@@ -140,50 +140,9 @@ fn a_click_on_the_panel_arrives_in_panel_pixels() {
     }
 }
 
-/// And the release has to deliver the same coordinate. Routing the press
-/// correctly and then handing the window position to the framework anyway
-/// would put the tap wherever the body happens to have pushed the panel.
-#[test]
-fn a_tap_is_delivered_in_panel_pixels() {
-    let press = Press {
-        window: Point::new(300, 220),
-        panel: Point::new(40, 30),
-    };
-
-    assert_eq!(
-        press.tap(Point::new(303, 224)),
-        Some(press.panel),
-        "the tap did not land where the finger went down"
-    );
-    assert_ne!(
-        press.tap(Point::new(303, 224)),
-        Some(press.window),
-        "the window coordinate was delivered as a tap"
-    );
-}
-
-/// A release that drifted was a drag, and its held positions already went
-/// through. Reporting a tap as well fires whatever the finger finished over.
-#[test]
-fn a_release_that_drifted_is_not_a_tap() {
-    let press = Press {
-        window: Point::new(300, 220),
-        panel: Point::new(40, 30),
-    };
-
-    assert_eq!(
-        press.tap(Point::new(308, 228)),
-        Some(press.panel),
-        "eight pixels of wobble is still a tap"
-    );
-    assert_eq!(press.tap(Point::new(309, 220)), None, "nine across is not");
-    assert_eq!(press.tap(Point::new(300, 229)), None, "nine down is not");
-    assert_eq!(
-        press.tap(Point::new(291, 220)),
-        None,
-        "nor nine the other way"
-    );
-}
+// What that panel coordinate then *becomes* — a tap, a drag, a swipe, a
+// gesture — is `tests/touch.rs`. Routing answers where a click landed and
+// stops there.
 
 /// The inset itself, checked against the body rather than against the code
 /// that produced it. Without this the test above passes even when the offset
@@ -363,12 +322,13 @@ fn a_described_body_is_bigger_than_the_panel_it_holds() {
 /// panel, as it always did.
 #[test]
 fn a_board_with_no_bezel_is_all_panel() {
-    for board in [Board::X4, Board::STICKY] {
-        assert!(
-            board.bezel.is_none(),
-            "{} grew a bezel — this test needs a board that has none",
-            board.name
-        );
+    // Every device described here has a body, so this is the path a board of
+    // some other size takes: a window that is exactly the panel.
+    for board in [
+        Board::custom("plain", 480, 800, false),
+        Board::custom("wide", 400, 300, true),
+    ] {
+        assert!(board.bezel.is_none(), "a custom board has no body");
 
         let panel = Panel::of(board);
         assert_eq!(
@@ -399,7 +359,9 @@ fn the_x3s_side_keys_are_pressable() {
     let inset = layout.panel_offset();
     let (panel_width, _) = layout.panel_size();
 
-    for (label, expected) in [("Up", Button::Up), ("Dn", Button::Down)] {
+    // One key per edge, which is what `hasEdgeSideButtons` names this board
+    // for. Up is on the left, Down on the right.
+    for (label, expected, on_the_right) in [("Up", Button::Up, false), ("Dn", Button::Down, true)] {
         let button = bezel
             .buttons
             .iter()
@@ -407,10 +369,17 @@ fn the_x3s_side_keys_are_pressable() {
             .unwrap_or_else(|| panic!("the X3 has a {label} key"));
 
         let at = layout.to_window(button.centre);
-        assert!(
-            at.x > inset.x + panel_width,
-            "{label} should sit beside the panel, not below it"
-        );
+        if on_the_right {
+            assert!(
+                at.x > inset.x + panel_width,
+                "{label} should sit past the panel's right edge"
+            );
+        } else {
+            assert!(
+                at.x < inset.x,
+                "{label} should sit before the panel's left edge"
+            );
+        }
         assert_eq!(click(&layout, panel, at), Hit::Button(expected));
     }
 }

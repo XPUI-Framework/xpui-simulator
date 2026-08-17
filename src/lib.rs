@@ -45,10 +45,18 @@
 //! Escape cannot be `Back`: `embedded-graphics-simulator` turns it into
 //! `SimulatorEvent::Quit` before [`button_for`] ever sees a key press.
 //!
-//! A click on the panel is a tap, a drag reports held positions, and the
-//! scroll wheel is a swipe — so touch behaviour can be exercised without a
-//! panel. A click anywhere else is never a touch: a device with no touchscreen
-//! cannot receive one at a coordinate it does not have.
+//! # The mouse as a finger
+//!
+//! A click and drag on the panel goes through [`Touchscreen`], which is
+//! CrossPoint's touch model ported constant for constant: the same slops, the
+//! same swipe window, the same long press, the same edge bands. A screen that
+//! feels right in this window feels the same on the device, and a gesture the
+//! firmware would refuse is refused here too. The scroll wheel is a plain
+//! swipe as well, for boards with no touchscreen to classify for.
+//!
+//! A click anywhere but the panel is never a touch, and neither is a click on
+//! a board that has no touchscreen: a device cannot receive one at a
+//! coordinate it has no way of producing.
 
 mod bezel;
 mod click;
@@ -56,15 +64,17 @@ mod keys;
 mod layout;
 mod panel;
 mod run;
+mod touch;
 
 pub use embedded_graphics_simulator::sdl2::Keycode;
 
 pub use bezel::paint as paint_body;
-pub use click::{Hit, Press, route};
+pub use click::{Hit, route};
 pub use keys::button_for;
 pub use layout::BezelLayout;
 pub use panel::{Panel, window_settings};
 pub use run::Simulator;
+pub use touch::{EdgeGesture, Touch, Touches, Touchscreen};
 pub use xpui_boards::Board;
 
 /// The crate's prose, compiled.

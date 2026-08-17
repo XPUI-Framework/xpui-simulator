@@ -12,10 +12,11 @@ use xpui::{App, Button, Point, SwipeDir};
 use xpui_eg::{Backend, Palette};
 
 use crate::bezel;
-use crate::click::{Hit, Press, route};
+use crate::click::{Hit, route};
 use crate::keys::button_for;
 use crate::layout::BezelLayout;
 use crate::panel::{Panel, window_settings};
+use crate::touch::{EdgeGesture, Touch, Touches, Touchscreen};
 
 /// The panel display, which is the only thing the firmware can draw on.
 type PanelDisplay = SimulatorDisplay<BinaryColor>;
@@ -98,10 +99,11 @@ impl Simulator {
 
         let mut app = App::new(root);
         let started = Instant::now();
-        // A press with no matching release would stay held forever, so both
-        // the drag position and the key under the finger are tracked rather
-        // than assumed.
-        let mut press: Option<Press> = None;
+        // The mouse, as a finger. Built from the board, so a device with no
+        // touchscreen classifies nothing at all.
+        let mut touch = Touchscreen::for_board(panel.board);
+        // A press with no matching release would stay held forever, so the key
+        // under the finger is tracked rather than assumed.
         let mut held: Option<Button> = None;
 
         // Paint once before the loop. `MultiWindow` creates its SDL window in
@@ -129,7 +131,11 @@ impl Simulator {
                 break;
             }
             frames += 1;
-            backend.begin_frame(started.elapsed().as_millis() as u32);
+            // One clock reading for the whole frame, and the one the framework
+            // is given. A long press timed against a different stamp from the
+            // one a screen reads is a long press that fires on the wrong frame.
+            let now = started.elapsed().as_millis() as u32;
+            backend.begin_frame(now);
 
             for event in window.events() {
                 match event {
@@ -158,11 +164,7 @@ impl Simulator {
                         let at = Point::new(point.x, point.y);
                         match route(layout.as_ref(), at, on_panel(backend, &window, point)) {
                             Hit::Panel(at_panel) => {
-                                press = Some(Press {
-                                    window: at,
-                                    panel: at_panel,
-                                });
-                                backend.input(|state| state.touch_down(at_panel));
+                                deliver(backend, &mut app, touch.down(at_panel, now));
                             }
                             Hit::Button(button) => {
                                 backend.press(button);
@@ -173,12 +175,14 @@ impl Simulator {
                         }
                     }
                     SimulatorEvent::MouseMove { point } => {
-                        // Only while a press that started on the panel is in
-                        // flight: a drag off a physical button is not a touch.
-                        if press.is_some()
-                            && let Some(at) = on_panel(backend, &window, point)
+                        // Only while a contact that started on the panel is in
+                        // flight, and only over the panel: a drag off a
+                        // physical button is not a touch, and a finger that has
+                        // left the glass reports nothing.
+                        if touch.is_down()
+                            && let Some(at) = panel_point(backend, &window, layout.as_ref(), point)
                         {
-                            backend.input(|state| state.touch_down(at));
+                            deliver(backend, &mut app, touch.moved(at));
                         }
                     }
                     SimulatorEvent::MouseButtonUp { point, mouse_btn } => {
@@ -191,12 +195,11 @@ impl Simulator {
                             backend.release(button);
                             body_dirty = true;
                         }
-                        let Some(down) = press.take() else { continue };
-
-                        backend.input(|state| state.touch_up());
-                        if let Some(at) = down.tap(Point::new(point.x, point.y)) {
-                            backend.tap(at);
-                        }
+                        // A release off the panel ends the contact without
+                        // being a sample of it: there is no panel pixel to say
+                        // the finger lifted at.
+                        let at = panel_point(backend, &window, layout.as_ref(), point);
+                        deliver(backend, &mut app, touch.up(at, now));
                     }
                     SimulatorEvent::MouseWheel { scroll_delta, .. } => {
                         let direction = match scroll_delta.y.signum() {
@@ -210,6 +213,11 @@ impl Simulator {
                     }
                 }
             }
+
+            // The long press is the one classification with no event behind
+            // it: the finger is still down and still where it landed, and what
+            // has changed is only the clock.
+            deliver(backend, &mut app, touch.tick(now));
 
             app.tick();
             let panel_dirty = app.render_if_dirty();
@@ -237,6 +245,72 @@ impl Simulator {
             // repainting it underneath erases the panel from the framebuffer.
             backend.with_display(|display| window.update_display(display));
             window.flush();
+        }
+    }
+}
+
+/// Where a mouse position is *on the panel*, or `None` when it is not there at
+/// all.
+///
+/// Routed rather than believed. A position one pixel above the panel comes
+/// back from the window as panel `(0, 0)`, because it divides by the pixel
+/// pitch and truncates — and a stray `(0, 0)` sample in the middle of a
+/// contact turns a tap into a swipe right across the screen.
+fn panel_point(
+    backend: &Backend<PanelDisplay>,
+    window: &MultiWindow,
+    layout: Option<&BezelLayout>,
+    at: WindowPoint,
+) -> Option<Point> {
+    match route(
+        layout,
+        Point::new(at.x, at.y),
+        on_panel(backend, window, at),
+    ) {
+        Hit::Panel(point) => Some(point),
+        Hit::Button(_) | Hit::Body => None,
+    }
+}
+
+/// Hands what the touchscreen decided to the backend, and to the app for the
+/// one gesture the framework owns rather than reports.
+fn deliver(backend: &Backend<PanelDisplay>, app: &mut App, touches: Touches) {
+    // An edge swipe arrives as both the swipe and its edge meaning, as it does
+    // on the device. Only the meaning is delivered: CrossPoint's
+    // `ActivityManager` consumes the home gesture before any activity sees the
+    // swipe (`ActivityManager.cpp:75-81`), and feeding both here would go home
+    // and move focus down in the same frame.
+    let edged = touches.iter().any(|touch| matches!(touch, Touch::Edge(_)));
+
+    for touch in touches {
+        match touch {
+            Touch::Held(at) => backend.input(|state| state.touch_down(at)),
+            Touch::Released => backend.input(|state| state.touch_up()),
+            Touch::Tap(at) => backend.tap(at),
+            Touch::Swipe(direction) if !edged => backend.swipe(direction),
+            Touch::Swipe(_) => {}
+            Touch::Edge(EdgeGesture::Back) => {
+                backend.input(|state| state.back_gesture());
+                // And as a `Back` press, which is what the gesture *is* on the
+                // device: `MappedInputManager.cpp:280-288` folds it into the
+                // logical button, so an activity handling the key handles the
+                // swipe without knowing there was one. Released in the same
+                // frame, or it would auto-repeat.
+                backend.press(Button::Back);
+                backend.release(Button::Back);
+            }
+            Touch::Edge(EdgeGesture::Home) => {
+                backend.input(|state| state.home_gesture());
+                // The system gesture, handled above the screen stack — the
+                // same route the H key takes.
+                app.home_gesture();
+            }
+            // Neither has anywhere to go yet: `InputSource` has no menu
+            // gesture and no long press, and CrossPoint's own FFI has no
+            // `cpp_input_was_menu_gesture` either. They are classified rather
+            // than dropped so that wiring one up is a change here and not a
+            // second touch model.
+            Touch::Edge(EdgeGesture::Menu) | Touch::LongPress(_) => {}
         }
     }
 }

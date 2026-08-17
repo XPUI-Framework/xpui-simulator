@@ -63,10 +63,21 @@ as before. Bodies arrive one device at a time.
 `SimulatorEvent::Quit` before the event reaches the keyboard map, so there is no
 key press left to interpret. Backspace is Back.
 
-Clicking *on the panel* is a tap, dragging reports held positions, and the
-scroll wheel is a swipe — so the touch paths are exercised too, not just the
-buttons. Clicking a physical button on the shell presses it, exactly as a key
-does, and holding one shows it held.
+Clicking a physical button on the shell presses it, exactly as a key does, and
+holding one shows it held.
+
+## The mouse as a finger
+
+Clicking *on the panel* is a tap, dragging is a drag and then a swipe, holding
+still is a long press, and a swipe that starts at an edge is a back, home or
+menu gesture. The classification is CrossPoint's, ported constant for constant
+from the firmware — the same slops, the same 700 ms swipe window, the same edge
+bands — so a gesture that works here works on the device, and one the device
+would refuse is refused here. The scroll wheel is a plain swipe as well, which
+is how a board with no touchscreen still exercises the swipe paths.
+
+**A board with no touchscreen reports no touch at all.** Clicking a Badger
+2040's panel does nothing, because a Badger 2040 cannot be touched.
 
 ## Requirements
 
