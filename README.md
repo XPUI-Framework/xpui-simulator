@@ -44,8 +44,8 @@ at a coordinate it has no way of producing.
 The row reading `Back OK Up Dn` *inside* the canvas is not one of these. That is
 firmware UI, which the real device draws on the e-ink too.
 
-A board that has not described a body opens a window that is exactly the panel,
-as before. Bodies arrive one device at a time.
+A board that has not described a body shows the bare panel instead, letterboxed
+in the middle of the window. Bodies arrive one device at a time.
 
 ## Keys
 
@@ -65,6 +65,33 @@ key press left to interpret. Backspace is Back.
 
 Clicking a physical button on the shell presses it, exactly as a key does, and
 holding one shows it held.
+
+**Holding a key sends one press.** The window manager's auto-repeat is dropped,
+because hardware has none: a key held on a device sends one press and stays
+down, and the framework runs its own repeat off that.
+
+Keys arrive raw. What two presses close together *mean* is the firmware's
+decision, so `Simulator::keys` hands them over before the framework sees them —
+`translate` renames or swallows a press, `due` invents one from a timer. That is
+how a board with three keys along its bottom edge finds a Back it has no room
+for. See [`docs/running.md`](docs/running.md).
+
+## Changing it while it runs
+
+| Key | |
+|---|---|
+| B, Shift+B | the next board, or the previous one |
+| + / - | zoom in and out |
+| E | show or hide the device body |
+| S | write the panel to `target/screenshots/` |
+
+**The screen stack survives a board switch**: the screen you had navigated to is
+re-measured against the new panel and painted on it, which is the point — every
+panel without a run each, and without navigating back each time.
+
+The window itself never resizes; it is opened once for the largest board and
+letterboxes the rest. That is what limits zoom, too. See
+[docs/running.md](docs/running.md).
 
 ## The mouse as a finger
 

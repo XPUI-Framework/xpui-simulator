@@ -27,7 +27,8 @@ cargo run -p xpui-gallery
 
 That is the fastest way to see a framework change: the
 [gallery](../../../../examples/gallery/) has a screen each for controls, lists,
-dialogs, scrolling and text, so a widget that broke shows up in one of them.
+dialogs, scrolling, text, typefaces and one that puts everything on a single
+page, so a widget that broke shows up in one of them.
 
 Opening a screen of your own instead:
 
@@ -56,18 +57,25 @@ every panel pixel changes nothing about what the screen is laid out against.
 
 ## Boards
 
-`Panel::of(board)` takes a [`Board`](../../chrome/src/board.rs) — a panel size,
+`Panel::of(board)` takes a [`Board`](../../../boards/src/lib.rs) — a panel size,
 the chrome sized for it, and whether it has a touchscreen. It is the *same*
 value a firmware reads, which is what makes "develop in a window, then flash
 it" true rather than aspirational, and it picks a sensible scale so a 296 × 128
 strip is not a postage stamp on a modern display.
 
 ```bash
+cargo run -p xpui-gallery -- --board x4            # the default
+cargo run -p xpui-gallery -- --board x3
+cargo run -p xpui-gallery -- --board x4pro         # the touch reader
+cargo run -p xpui-gallery -- --board sticky
 cargo run -p xpui-gallery -- --board badger2040
 cargo run -p xpui-gallery -- --board tufty2040
-cargo run -p xpui-gallery -- --board x4            # the default
-cargo run -p xpui-gallery -- --board sticky
+cargo run -p xpui-gallery -- --board inkyframe
 ```
+
+`--board` picks the one it opens on. **B** walks the rest of them without
+restarting — see [Changing it while it runs](#changing-it-while-it-runs) —
+which is the quicker way to see a screen on all of them.
 
 This is worth doing early rather than at the end. A Badger 2040's content band
 is 90 pixels; a screen that looks spacious at 480 × 800 can have nowhere to put
@@ -108,6 +116,50 @@ contract: a screen asks for `Confirm` and the host decides what that is.
 event reaches us, so there is no key press left to interpret. Backspace is Back;
 Escape closes the window.
 
+**Holding a key sends one press.** The window manager's auto-repeat is dropped,
+because hardware has none: a key held on a device sends one press and stays
+down, and the framework runs its own repeat off that. Letting the repeats
+through re-arms that timer on each one, so a held key would step at the desktop's
+rate rather than the framework's.
+
+### Reading something into a press
+
+Keys reach the framework as the hardware sent them. A board can have fewer keys
+than it has meanings — a badge with three along its bottom edge has no room for
+a Back key — and folding two together is the *firmware's* decision, not the
+simulator's. `Simulator::keys` is where a caller gets between:
+
+```rust
+# use xpui::Button;
+# use xpui_simulator::{Keys, Press};
+/// Swaps the page keys over, for somebody holding the device the other way up.
+struct Swapped;
+
+impl Keys for Swapped {
+    fn translate(&mut self, press: Press) -> Option<Button> {
+        Some(match press.button {
+            Button::PageBack => Button::PageForward,
+            Button::PageForward => Button::PageBack,
+            other => other,
+        })
+    }
+}
+```
+
+Two directions, and they are not the same thing:
+
+- **`translate`** renames a press. Returning `None` swallows it. The release of
+  that key follows whatever it became, so a press turned into `Back` is released
+  as `Back` — a caller never has to track that.
+- **`due`** invents one, from a timer, with no key behind it. It is delivered as
+  a press *and* its release in the same frame, because there is no finger to
+  lift later and a button left held auto-repeats.
+
+The gallery uses both: on a three-key board it swallows the first press of `a`
+and re-issues it when the double-press window shuts. That costs every select on
+those boards a third of a second — see `gallery::chord` for why it is worth it
+there and what to weigh before choosing it for another board.
+
 | Mouse | |
 |---|---|
 | Left click on the panel | a tap |
@@ -115,6 +167,59 @@ Escape closes the window.
 | Left press, held still | a long press after half a second |
 | Left click on a physical button | presses it, exactly as its key does |
 | Scroll wheel | a swipe: wheel up reports `SwipeDir::Down`, wheel down `SwipeDir::Up` |
+
+## Changing it while it runs
+
+Checking a screen on every panel used to be one `cargo run` per board, each
+losing whatever you had navigated to — and that state is usually the thing you
+wanted to look at. These keys change the simulator instead of restarting it,
+and the screen stack survives all of them.
+
+| Key | |
+|---|---|
+| B | the next board |
+| Shift+B | the previous board |
+| + | zoom in, as far as the window allows |
+| - | zoom out, down to life size |
+| E | show or hide the device body |
+| S | write the panel to `target/screenshots/` and print the path |
+
+Switching board installs a different backend, because a different panel size
+needs one. The screens carry on running on it: the app owns the stack, and the
+screen on top is re-measured against the new panel on the next frame. That is
+the whole point — the same screen, on another panel, without navigating back
+to it each time.
+
+One backend is kept per board and reused, so cycling for an hour costs under
+two megabytes in total rather than a panel's worth of pixels per press.
+
+### The window never resizes
+
+There is no resize API: `MultiWindow` fixes its SDL window and its streaming
+texture in the constructor. So the window is opened once, large enough for the
+largest board these keys can reach, and every smaller one is letterboxed into
+the middle of it. Hiding the body does not shrink the window — it grows the
+letterbox.
+
+That is also what limits zoom. A scale whose device would not fit the window is
+refused, and a 480 × 800 reader inside its body is already 1165 pixels tall, so
+those boards stay at life size. Zoom is for the small panels: a Badger 2040
+opens tripled, a Tufty 2040 doubled, and both go further with the body hidden.
+
+**Zoom changes nothing about the layout.** Scale is a window concern — the
+panel is the same number of pixels at 1× as at 3× — and a screen that
+re-lays-out when you zoom means the scale has leaked into the board.
+
+### Screenshots
+
+`S` writes the *panel*: not the window, and not the device drawn around it. A
+picture of a screen with a simulated body in it is not a picture of what the
+device would show.
+
+The file is a 1-bit BMP named `<slug>-<n>.bmp`, and its path is printed — a
+screenshot you cannot find is not a screenshot. `n` is the first number not
+already taken, so pressing the key twice gives two files and a later run does
+not overwrite an earlier one's. `XPUI_SCREENSHOT_DIR` moves them elsewhere.
 
 ## The mouse as a finger
 
@@ -149,10 +254,9 @@ screen ship depending on it. Use the keys, or a board that has a touchscreen.
 ## The device around the panel
 
 A board that has described its body — see
-[`Bezel`](../../../boards/src/bezel.rs) —
-opens a window larger than its panel. The panel is inset into a shell drawn from
-the device's published millimetre dimensions, with its real buttons where a thumb
-would find them.
+[`Bezel`](../../../boards/src/bezel.rs) — is drawn inside it. The panel is
+inset into a shell drawn from the device's published millimetre dimensions,
+with its real buttons where a thumb would find them.
 
 ```bash
 cargo run -p xpui-gallery -- --board badger2040   # five buttons, all on the front
@@ -166,14 +270,14 @@ around a fifth control has nowhere to put it.
 
 The layout is kept in tenths of a millimetre rather than pixels, so the scale
 the window opens at changes how big the device is drawn and nothing about where
-anything sits on it. That scale is now chosen from the whole window rather than
+anything sits on it. That scale is chosen from the whole window rather than
 from the panel, because a small panel can sit in a comparatively large body.
 
 The row reading `Back OK Up Dn` *inside* the canvas is not one of these
 buttons. It is firmware UI, which the real device draws on the e-ink too.
 
-A board that has not described a body opens a window that is exactly the panel,
-as before — the X4 and the Sticky both do today.
+**E** hides the body, leaving the bare panel letterboxed in the middle of the
+window — which is what a board that has never described one shows.
 
 ## `--frames N`
 

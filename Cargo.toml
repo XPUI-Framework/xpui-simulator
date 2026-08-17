@@ -18,7 +18,10 @@ crate-type = ["rlib"]
 xpui.workspace = true
 xpui-boards.workspace = true
 xpui-chrome.workspace = true
-xpui-embedded-graphics.workspace = true
+# `framebuffer` for the screenshot key: it is the BMP writer the screenshot
+# tests already use, and a second one here would be a second thing to get
+# wrong. Host-only, which this crate is anyway — it links SDL.
+xpui-embedded-graphics = { workspace = true, features = ["framebuffer"] }
 embedded-graphics = "0.8"
 embedded-graphics-simulator = "0.8"
 
@@ -26,4 +29,3 @@ embedded-graphics-simulator = "0.8"
 # The guide shows how to screenshot a screen without a window, and that block
 # is compiled rather than taken on trust.
 xpui = { workspace = true, features = ["testing"] }
-xpui-embedded-graphics = { workspace = true, features = ["framebuffer"] }

@@ -49,17 +49,21 @@ const WELL_LIP: i32 = 12;
 ///
 /// Cheap enough to redraw whole: it is `Rgb888` on the host, and it changes
 /// only when a button goes down or comes up.
+///
+/// The body is drawn at the layout's origin, so a device smaller than the
+/// window lands in the middle of it with desk showing either side.
 pub fn paint(
     display: &mut SimulatorDisplay<Rgb888>,
     layout: &BezelLayout,
     held: Option<KeyAction>,
 ) {
     let (width, height) = layout.window_size();
-    let _ = display.clear(DESK);
+    let origin = layout.origin();
+    backdrop(display);
 
     fill_rounded(
         display,
-        rect(Point::zero(), (width, height)),
+        rect(Point::new(origin.x, origin.y), (width, height)),
         layout.to_window_size((SHELL_RADIUS, SHELL_RADIUS)).0,
         SHELL,
     );
@@ -69,6 +73,16 @@ pub fn paint(
     for button in layout.bezel().buttons {
         key(display, layout, button, held == Some(button.action));
     }
+}
+
+/// Everything that is not the device: what a board with no body, or one whose
+/// body is hidden, leaves around its panel.
+///
+/// The window is fixed at the largest board it can show, so every smaller one
+/// is letterboxed into the middle of it, and something has to paint the margin
+/// or the board switched away from is still visible in it.
+pub fn backdrop(display: &mut SimulatorDisplay<Rgb888>) {
+    let _ = display.clear(DESK);
 }
 
 /// The recess the panel sits in: the panel's rectangle, grown by a lip.

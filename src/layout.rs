@@ -18,6 +18,13 @@ pub struct BezelLayout {
     bezel: Bezel,
     /// The panel's size in window pixels: its own pixels times the scale.
     panel_px: (i32, i32),
+    /// Where the body's top-left corner sits in the window.
+    ///
+    /// Zero when the window is exactly the body. It is not, once the window is
+    /// fixed and every board is letterboxed into the middle of it — and the
+    /// offset has to live here rather than only in the painter, because the
+    /// same numbers route every mouse position back onto the device.
+    origin: Point,
 }
 
 impl BezelLayout {
@@ -33,7 +40,19 @@ impl BezelLayout {
         BezelLayout {
             bezel,
             panel_px: (width * scale as i32, height * scale as i32),
+            origin: Point::ORIGIN,
         }
+    }
+
+    /// The same body, moved to `origin` in the window.
+    pub const fn at(mut self, origin: Point) -> BezelLayout {
+        self.origin = origin;
+        self
+    }
+
+    /// Where the body's top-left corner sits in the window.
+    pub const fn origin(&self) -> Point {
+        self.origin
     }
 
     /// The device this describes.
@@ -41,7 +60,11 @@ impl BezelLayout {
         &self.bezel
     }
 
-    /// The whole window, in pixels: the body, drawn at the panel's own ratio.
+    /// The body's own size in pixels, drawn at the panel's ratio.
+    ///
+    /// Not the window's size once the window is fixed and larger than this:
+    /// it is how much of the window the device fills, which is what decides
+    /// how much letterbox is left over.
     pub const fn window_size(&self) -> (i32, i32) {
         (self.px_x(self.bezel.body.0), self.px_y(self.bezel.body.1))
     }
@@ -76,7 +99,10 @@ impl BezelLayout {
 
     /// A point on the device, in window pixels.
     pub const fn to_window(self, at: (i32, i32)) -> Point {
-        Point::new(self.px_x(at.0), self.px_y(at.1))
+        Point::new(
+            self.origin.x + self.px_x(at.0),
+            self.origin.y + self.px_y(at.1),
+        )
     }
 
     /// A size on the device, in window pixels.
@@ -86,9 +112,11 @@ impl BezelLayout {
 
     /// A window pixel, back in tenths of a millimetre.
     pub const fn to_device(self, at: Point) -> (i32, i32) {
+        let x = at.x - self.origin.x;
+        let y = at.y - self.origin.y;
         (
-            divide(at.x * self.bezel.panel_size.0, self.panel_px.0),
-            divide(at.y * self.bezel.panel_size.1, self.panel_px.1),
+            divide(x * self.bezel.panel_size.0, self.panel_px.0),
+            divide(y * self.bezel.panel_size.1, self.panel_px.1),
         )
     }
 

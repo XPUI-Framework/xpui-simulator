@@ -1,11 +1,20 @@
 //! The panel to simulate, and how a window presents one of its pixels.
 
-use embedded_graphics::pixelcolor::Rgb888;
-use embedded_graphics_simulator::{BinaryColorTheme, OutputSettings, OutputSettingsBuilder};
+use embedded_graphics::pixelcolor::{BinaryColor, Rgb888};
+use embedded_graphics_simulator::{
+    BinaryColorTheme, OutputSettings, OutputSettingsBuilder, SimulatorDisplay,
+};
 
 use xpui_boards::Board;
 
 use crate::layout::BezelLayout;
+
+/// The panel display, which is the only thing the firmware can draw on.
+///
+/// One bit per pixel, like the panels themselves. Everything outside it — the
+/// body, the letterbox — is drawn on a separate colour display that the
+/// firmware cannot reach.
+pub type PanelDisplay = SimulatorDisplay<BinaryColor>;
 
 /// The panel to simulate.
 #[derive(Copy, Clone, Debug)]
@@ -54,7 +63,11 @@ impl Panel {
     ///
     /// The budget is deliberately conservative: a window that does not fit
     /// cannot be moved back on screen on every desktop.
-    const fn scale_for(board: Board) -> u32 {
+    ///
+    /// Public because the window a session opens is the largest of these
+    /// across every board it can switch to, and computing that twice is how
+    /// the two would drift.
+    pub const fn scale_for(board: Board) -> u32 {
         const MAX_WIDTH: i32 = 1200;
         const MAX_HEIGHT: i32 = 900;
         const MAX_SCALE: u32 = 3;

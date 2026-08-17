@@ -45,6 +45,27 @@
 //! Escape cannot be `Back`: `embedded-graphics-simulator` turns it into
 //! `SimulatorEvent::Quit` before [`button_for`] ever sees a key press.
 //!
+//! # Changing it while it runs
+//!
+//! | Key | |
+//! |---|---|
+//! | B / Shift+B | the next board, or the previous one |
+//! | + / - | zoom in and out |
+//! | E | show or hide the device body |
+//! | S | write the panel to `target/screenshots/` |
+//!
+//! The screen stack survives a board switch: the same screen you had navigated
+//! to is re-measured against the new panel and painted on it, which is the
+//! whole point — six panels without six runs, and without navigating back to
+//! the screen you wanted to look at each time.
+//!
+//! The window itself never changes size. It is opened once, large enough for
+//! the largest board any of these keys can reach, and every smaller one is
+//! letterboxed into the middle of it. That is also what limits zoom: a scale
+//! whose device would not fit the window is refused, so a reader-sized panel
+//! stays at life size and the small strips are where zooming actually buys
+//! something. See [`Control`] and [`Session`].
+//!
 //! # The mouse as a finger
 //!
 //! A click and drag on the panel goes through [`Touchscreen`], which is
@@ -57,23 +78,43 @@
 //! A click anywhere but the panel is never a touch, and neither is a click on
 //! a board that has no touchscreen: a device cannot receive one at a
 //! coordinate it has no way of producing.
+//!
+//! # Raw presses
+//!
+//! Keys arrive as the hardware sends them: one press per press, no repeat, and
+//! no reading between them. A board with three keys along its bottom edge has
+//! no room for a Back key and has to fold one into another — but *what two
+//! presses mean* is the firmware's decision, not the simulator's, so
+//! [`Simulator::keys`] hands them over before the framework sees them. See
+//! [`Keys`].
 
 mod bezel;
 mod click;
+mod controls;
+mod feed;
 mod keys;
 mod layout;
 mod panel;
+mod present;
+mod press;
 mod run;
+mod screenshot;
+mod session;
 mod touch;
 
 pub use embedded_graphics_simulator::sdl2::Keycode;
 
 pub use bezel::paint as paint_body;
 pub use click::{Hit, route};
+pub use controls::{Control, control_for};
 pub use keys::button_for;
 pub use layout::BezelLayout;
-pub use panel::{Panel, window_settings};
+pub use panel::{Panel, PanelDisplay, window_settings};
+pub use present::open_frame;
+pub use press::{Keypad, Keys, Press, Raw};
 pub use run::Simulator;
+pub use screenshot::capture as capture_panel;
+pub use session::Session;
 pub use touch::{EdgeGesture, Touch, Touches, Touchscreen};
 pub use xpui_boards::Board;
 
