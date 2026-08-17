@@ -9,8 +9,8 @@
 //! therefore moves nothing on the device — a button stays at the same
 //! millimetre, which is what makes zoom cost no second set of numbers.
 
-use xpui::{Button, Point};
-use xpui_boards::Bezel;
+use xpui::Point;
+use xpui_boards::{Bezel, KeyAction};
 
 /// A device's body, its panel and its buttons, in window pixels.
 #[derive(Copy, Clone, Debug)]
@@ -92,11 +92,11 @@ impl BezelLayout {
         )
     }
 
-    /// The physical button under a window pixel, if there is one.
-    pub fn button_at(&self, at: Point) -> Option<Button> {
+    /// What pressing the window pixel `at` would mean, if there is a key there.
+    pub fn button_at(&self, at: Point) -> Option<KeyAction> {
         self.bezel
             .button_at(self.to_device(at))
-            .map(|button| button.button)
+            .map(|key| key.action)
     }
 
     /// Tenths of a millimetre across, in window pixels.

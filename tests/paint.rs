@@ -105,7 +105,7 @@ fn a_held_key_looks_different() {
         paint_body(&mut idle, &layout, None);
 
         let mut held = SimulatorDisplay::new(Size::new(width as u32, height as u32));
-        paint_body(&mut held, &layout, Some(button.button));
+        paint_body(&mut held, &layout, Some(button.action));
 
         let centre = layout.to_window(button.centre);
         assert_ne!(

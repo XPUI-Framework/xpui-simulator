@@ -13,7 +13,7 @@ use embedded_graphics::prelude::*;
 use embedded_graphics::primitives::{PrimitiveStyle, Rectangle, RoundedRectangle};
 use embedded_graphics::text::{Alignment, Baseline, Text, TextStyleBuilder};
 use embedded_graphics_simulator::SimulatorDisplay;
-use xpui::Button;
+use xpui_boards::KeyAction;
 use xpui_boards::PhysicalButton;
 
 use crate::layout::BezelLayout;
@@ -49,7 +49,11 @@ const WELL_LIP: i32 = 12;
 ///
 /// Cheap enough to redraw whole: it is `Rgb888` on the host, and it changes
 /// only when a button goes down or comes up.
-pub fn paint(display: &mut SimulatorDisplay<Rgb888>, layout: &BezelLayout, held: Option<Button>) {
+pub fn paint(
+    display: &mut SimulatorDisplay<Rgb888>,
+    layout: &BezelLayout,
+    held: Option<KeyAction>,
+) {
     let (width, height) = layout.window_size();
     let _ = display.clear(DESK);
 
@@ -63,7 +67,7 @@ pub fn paint(display: &mut SimulatorDisplay<Rgb888>, layout: &BezelLayout, held:
     well(display, layout);
 
     for button in layout.bezel().buttons {
-        key(display, layout, button, held == Some(button.button));
+        key(display, layout, button, held == Some(button.action));
     }
 }
 

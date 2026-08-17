@@ -8,7 +8,8 @@
 //! touch" a property of the type rather than of a branch somebody has to
 //! remember.
 
-use xpui::{Button, Point};
+use xpui::Point;
+use xpui_boards::KeyAction;
 
 use crate::layout::BezelLayout;
 
@@ -17,8 +18,8 @@ use crate::layout::BezelLayout;
 pub enum Hit {
     /// On the panel, at this *panel* pixel — never a window pixel.
     Panel(Point),
-    /// On a physical button.
-    Button(Button),
+    /// On a physical key, which may mean a button or the home gesture.
+    Key(KeyAction),
     /// On the body, where there is nothing to press.
     Body,
 }
@@ -41,7 +42,7 @@ pub fn route(layout: Option<&BezelLayout>, window_point: Point, panel_point: Opt
     match (panel_point, on_body) {
         (Some(at), false) => Hit::Panel(at),
         _ => match layout.and_then(|layout| layout.button_at(window_point)) {
-            Some(button) => Hit::Button(button),
+            Some(action) => Hit::Key(action),
             None => Hit::Body,
         },
     }

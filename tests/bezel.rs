@@ -7,6 +7,7 @@
 //! cannot physically have.
 
 use xpui::{Button, Point};
+use xpui_boards::KeyAction;
 use xpui_boards::{Bezel, Board};
 use xpui_simulator::{BezelLayout, Hit, Panel, route};
 
@@ -66,7 +67,7 @@ fn a_click_in_the_middle_of_a_key_presses_it() {
             let at = layout.to_window(button.centre);
             assert_eq!(
                 click(&layout, panel, at),
-                Hit::Button(button.button),
+                Hit::Key(button.action),
                 "{}: clicking the middle of {:?} did not press it",
                 board.name,
                 button.label
@@ -233,7 +234,7 @@ fn a_click_off_the_panel_is_never_delivered_as_a_touch() {
                         );
                         panels += 1;
                     }
-                    Hit::Button(_) => {
+                    Hit::Key(_) => {
                         assert!(
                             !on_the_panel(at),
                             "{}: a click at {at:?} is on the panel and pressed \
@@ -289,7 +290,7 @@ fn scaling_grows_the_body_without_moving_a_key() {
             let at = layout.to_window(button.centre);
             assert_eq!(
                 click(&layout, panel, at),
-                Hit::Button(button.button),
+                Hit::Key(button.action),
                 "at {scale}x, the middle of {:?} pressed something else",
                 button.label
             );
@@ -361,7 +362,10 @@ fn the_x3s_side_keys_are_pressable() {
 
     // One key per edge, which is what `hasEdgeSideButtons` names this board
     // for. Up is on the left, Down on the right.
-    for (label, expected, on_the_right) in [("Up", Button::Up, false), ("Dn", Button::Down, true)] {
+    for (label, expected, on_the_right) in [
+        ("Prev", Button::PageBack, false),
+        ("Next", Button::PageForward, true),
+    ] {
         let button = bezel
             .buttons
             .iter()
@@ -380,6 +384,9 @@ fn the_x3s_side_keys_are_pressable() {
                 "{label} should sit before the panel's left edge"
             );
         }
-        assert_eq!(click(&layout, panel, at), Hit::Button(expected));
+        assert_eq!(
+            click(&layout, panel, at),
+            Hit::Key(KeyAction::Press(expected))
+        );
     }
 }

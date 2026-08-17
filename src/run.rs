@@ -9,6 +9,7 @@ use embedded_graphics_simulator::{MultiWindow, OutputSettings, SimulatorDisplay,
 
 use xpui::screen::Screen;
 use xpui::{App, Button, Point, SwipeDir};
+use xpui_boards::KeyAction;
 use xpui_eg::{Backend, Palette};
 
 use crate::bezel;
@@ -104,7 +105,7 @@ impl Simulator {
         let mut touch = Touchscreen::for_board(panel.board);
         // A press with no matching release would stay held forever, so the key
         // under the finger is tracked rather than assumed.
-        let mut held: Option<Button> = None;
+        let mut held: Option<KeyAction> = None;
 
         // Paint once before the loop. `MultiWindow` creates its SDL window in
         // its constructor, so `events()` is safe here — but the first frame
@@ -166,9 +167,15 @@ impl Simulator {
                             Hit::Panel(at_panel) => {
                                 deliver(backend, &mut app, touch.down(at_panel, now));
                             }
-                            Hit::Button(button) => {
-                                backend.press(button);
-                                held = Some(button);
+                            Hit::Key(action) => {
+                                // Home is a gesture rather than a press: the
+                                // reader that has this key reports it from the
+                                // touch controller, not from a pin.
+                                match action {
+                                    KeyAction::Press(button) => backend.press(button),
+                                    KeyAction::Home => app.home_gesture(),
+                                }
+                                held = Some(action);
                                 body_dirty = true;
                             }
                             Hit::Body => {}
@@ -191,8 +198,10 @@ impl Simulator {
                         }
                         // A key is released wherever the mouse came up, or it
                         // would stay held for the rest of the session.
-                        if let Some(button) = held.take() {
-                            backend.release(button);
+                        if let Some(action) = held.take() {
+                            if let KeyAction::Press(button) = action {
+                                backend.release(button);
+                            }
                             body_dirty = true;
                         }
                         // A release off the panel ends the contact without
@@ -268,7 +277,7 @@ fn panel_point(
         on_panel(backend, window, at),
     ) {
         Hit::Panel(point) => Some(point),
-        Hit::Button(_) | Hit::Body => None,
+        Hit::Key(_) | Hit::Body => None,
     }
 }
 
