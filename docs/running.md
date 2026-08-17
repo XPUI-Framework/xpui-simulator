@@ -75,6 +75,19 @@ its third row, and the panel is where you find that out. With the *default*
 chrome that band is 28 pixels and a list draws no rows at all, which is why
 `Board` carries a token preset rather than only a size.
 
+### The window lies about how big everything is
+
+A reader's panel is 217 to 257 ppi. A laptop display is around 110, so the
+window shows it at roughly twice life size: a label that looks generous here is
+a shade over 2mm on the glass, and a row that looks like a comfortable target
+is 4mm across.
+
+Nothing in the window can tell you that, so the boards carry the panel's
+diagonal and `Board::tenths_of_a_mm` answers in millimetres. A board a finger
+drives also carries a UI scale — its chrome and its type come out larger than
+the same panel's would with keys, which is why an X4 and a touch reader of the
+same size do not look alike in the window either.
+
 ## Keys and mouse
 
 Named by meaning rather than position, because that is the framework's own
