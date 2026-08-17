@@ -47,10 +47,12 @@ fn main() {
 }
 ```
 
-`Panel::DEFAULT` is 480 × 800 and `Panel::DEFAULT` is 800 × 480, both at 1:1.
-A 1-bit panel at 1:1 is hard to read on a high-density display, so
-`Panel::DEFAULT.scaled(2)` doubles every panel pixel in the window without
-changing what the screen is laid out against.
+`Panel::DEFAULT` is the X4: 800 × 480 at 1:1. `Panel::of(board)` gives any
+other device its own size and a scale that keeps the window within reach of a
+laptop display — a 296 × 128 strip at 1:1 is a postage stamp, so it is tripled.
+
+`Panel::of(..).scaled(n)` overrides that. Scale is a window concern: doubling
+every panel pixel changes nothing about what the screen is laid out against.
 
 ## Boards
 
@@ -95,17 +97,50 @@ Escape closes the window.
 
 | Mouse | |
 |---|---|
-| Left click | a tap |
-| Left drag | held positions, frame by frame |
+| Left click on the panel | a tap |
+| Left drag on the panel | held positions, frame by frame |
+| Left click on a physical button | presses it, exactly as its key does |
 | Scroll wheel | a swipe: wheel up reports `SwipeDir::Down`, wheel down `SwipeDir::Up` |
 
 So the touch paths are exercised too, not only the buttons.
 
-Two details of the mouse are deliberate. A tap is reported at the point the
+Three details of the mouse are deliberate. A tap is reported at the point the
 button went *down*, not where it came up, which is what the framework expects
-and what stops a slightly shaky click landing on a different control. And a
-release that drifted more than eight pixels from the press is not reported as a
-tap at all — it was a drag, and the drag frames already went through.
+and what stops a slightly shaky click landing on a different control. A release
+that drifted more than eight window pixels from the press is not reported as a
+tap at all — it was a drag, and the drag frames already went through. And a
+click that missed the panel is **never** a touch, whatever it hit: a device
+with no touchscreen has no such coordinate to be touched at, and a simulator
+that invented one would let a screen ship depending on it.
+
+## The device around the panel
+
+A board that has described its body — see
+[`Bezel`](../../../boards/src/bezel.rs) —
+opens a window larger than its panel. The panel is inset into a shell drawn from
+the device's published millimetre dimensions, with its real buttons where a thumb
+would find them.
+
+```bash
+cargo run -p xpui-gallery -- --board badger2040   # five buttons, all on the front
+cargo run -p xpui-gallery -- --board x3           # Up and Down on the side
+```
+
+Clicking one presses it and holding one shows it held, which is worth doing
+early for the same reason picking the right board is: it is how you notice that
+the Badger's five buttons are the *only* input it has, and that a screen built
+around a fifth control has nowhere to put it.
+
+The layout is kept in tenths of a millimetre rather than pixels, so the scale
+the window opens at changes how big the device is drawn and nothing about where
+anything sits on it. That scale is now chosen from the whole window rather than
+from the panel, because a small panel can sit in a comparatively large body.
+
+The row reading `Back OK Up Dn` *inside* the canvas is not one of these
+buttons. It is firmware UI, which the real device draws on the e-ink too.
+
+A board that has not described a body opens a window that is exactly the panel,
+as before — the X4 and the Sticky both do today.
 
 ## `--frames N`
 

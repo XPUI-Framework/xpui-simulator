@@ -8,12 +8,14 @@
 
 use xpui_simulator::{Board, Panel};
 
-/// The window is exactly the panel times the scale. No gaps, no padding.
+/// The whole window, body included — not the panel times the scale.
+///
+/// The difference is the point. A board that describes a body opens a window
+/// larger than its panel, and a budget checked against the panel alone let the
+/// Tufty 2040 — a 320x240 panel in a comparatively large shell — open at
+/// 1280x1034 while claiming to be 960x720.
 fn window(panel: Panel) -> (i32, i32) {
-    (
-        panel.width * panel.scale as i32,
-        panel.height * panel.scale as i32,
-    )
+    panel.window_size()
 }
 
 #[test]
@@ -28,6 +30,33 @@ fn every_board_gets_a_window_that_fits_a_modest_display() {
             width,
             height
         );
+    }
+}
+
+/// A board with a body opens a window larger than its panel; a board without
+/// one opens a window that is exactly the panel, as it always did.
+#[test]
+fn the_window_is_the_body_when_there_is_one_and_the_panel_when_there_is_not() {
+    for board in Board::ALL {
+        let panel = Panel::of(board);
+        let (window_width, window_height) = panel.window_size();
+        let (panel_width, panel_height) = panel.size_in_window();
+
+        if board.bezel.is_some() {
+            assert!(
+                window_width > panel_width && window_height > panel_height,
+                "{}: a {window_width}x{window_height} window round a \
+                 {panel_width}x{panel_height} panel leaves nowhere for a body",
+                board.name
+            );
+        } else {
+            assert_eq!(
+                (window_width, window_height),
+                (panel_width, panel_height),
+                "{}: no body was described, so the window is the panel",
+                board.name
+            );
+        }
     }
 }
 
