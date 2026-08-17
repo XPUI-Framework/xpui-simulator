@@ -18,45 +18,41 @@ fn window(panel: Panel) -> (i32, i32) {
     panel.window_size()
 }
 
+/// The scale is the largest that fits a modest display, and never smaller
+/// than life size.
+///
+/// It cannot be "the window always fits": a portrait reader is eight hundred
+/// pixels tall at 1:1, and a body around it makes eleven hundred. One to one is
+/// the floor, so on those boards the rule is that nothing was scaled up rather
+/// than that the result is small.
 #[test]
-fn every_board_gets_a_window_that_fits_a_modest_display() {
-    for board in Board::ALL {
-        let (width, height) = window(Panel::of(board));
-        assert!(
-            width <= 1200 && height <= 900,
-            "{}: {}x{} window is bigger than the budget — it may not fit, and \
-             a window that opens off screen cannot always be dragged back",
-            board.name,
-            width,
-            height
-        );
-    }
-}
-
-/// A board with a body opens a window larger than its panel; a board without
-/// one opens a window that is exactly the panel, as it always did.
-#[test]
-fn the_window_is_the_body_when_there_is_one_and_the_panel_when_there_is_not() {
+fn the_scale_is_the_largest_that_fits() {
     for board in Board::ALL {
         let panel = Panel::of(board);
-        let (window_width, window_height) = panel.window_size();
-        let (panel_width, panel_height) = panel.size_in_window();
+        assert!(panel.scale >= 1, "{}: scale below life size", board.name);
 
-        if board.bezel.is_some() {
-            assert!(
-                window_width > panel_width && window_height > panel_height,
-                "{}: a {window_width}x{window_height} window round a \
-                 {panel_width}x{panel_height} panel leaves nowhere for a body",
-                board.name
-            );
-        } else {
-            assert_eq!(
-                (window_width, window_height),
-                (panel_width, panel_height),
-                "{}: no body was described, so the window is the panel",
-                board.name
-            );
+        let (width, height) = window(panel);
+        if panel.scale == 1 {
+            continue;
         }
+
+        assert!(
+            width <= 1200 && height <= 900,
+            "{}: {}x{} at {}x is past the budget — it should have taken a \
+             smaller scale",
+            board.name,
+            width,
+            height,
+            panel.scale
+        );
+
+        let bigger = window(panel.scaled(panel.scale + 1));
+        assert!(
+            bigger.0 > 1200 || bigger.1 > 900,
+            "{}: {}x would still have fitted, so the scale is too timid",
+            board.name,
+            panel.scale + 1
+        );
     }
 }
 

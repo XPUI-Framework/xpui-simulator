@@ -97,12 +97,17 @@ fn key(
         (width, height),
     );
 
-    fill_rounded(
-        display,
-        face,
-        layout.to_window_size((KEY_RADIUS, KEY_RADIUS)).0,
-        if held { KEY_HELD } else { KEY },
-    );
+    // A key described as square is round on the device — the X4 Pro's Home key
+    // is the one of these there is. Drawing it with a corner radius of half its
+    // width is a circle, so the shape follows from the description rather than
+    // from a flag.
+    let radius = if width == height {
+        width / 2
+    } else {
+        layout.to_window_size((KEY_RADIUS, KEY_RADIUS)).0
+    };
+
+    fill_rounded(display, face, radius, if held { KEY_HELD } else { KEY });
     legend(display, button.label, face);
 }
 
