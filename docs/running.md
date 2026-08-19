@@ -155,10 +155,12 @@ Two directions, and they are not the same thing:
   a press *and* its release in the same frame, because there is no finger to
   lift later and a button left held auto-repeats.
 
-The gallery uses both: on a three-key board it swallows the first press of `a`
-and re-issues it when the double-press window shuts. That costs every select on
-those boards a third of a second — see `gallery::chord` for why it is worth it
-there and what to weigh before choosing it for another board.
+The gallery installs a reader for both, though no board here needs it: every
+one has a Back key of its own, so presses pass straight through. On a board
+with three keys and no spare, the reader swallows the first press of the
+stand-in key and re-issues it when the double-press window shuts — which costs
+every select a third of a second. See `gallery::chord` for what to weigh before
+choosing that arrangement.
 
 | Mouse | |
 |---|---|

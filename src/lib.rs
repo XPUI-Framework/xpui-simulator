@@ -82,9 +82,9 @@
 //! # Raw presses
 //!
 //! Keys arrive as the hardware sends them: one press per press, no repeat, and
-//! no reading between them. A board with three keys along its bottom edge has
-//! no room for a Back key and has to fold one into another — but *what two
-//! presses mean* is the firmware's decision, not the simulator's, so
+//! no reading between them. A board with fewer keys than jobs has to fold one
+//! into another — but *what two presses mean* is the firmware's decision, not
+//! the simulator's, so
 //! [`Simulator::keys`] hands them over before the framework sees them. See
 //! [`Keys`].
 
