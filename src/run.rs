@@ -228,6 +228,9 @@ impl Simulator {
                                         keypad.down(backend, button, now, session.board())
                                     }
                                     KeyAction::Home => app.home_gesture(),
+                                    // Drawn and pressable because the board has it;
+                                    // it just does nothing yet.
+                                    KeyAction::Unassigned => {}
                                 }
                                 held = Some(action);
                                 body_dirty = true;
