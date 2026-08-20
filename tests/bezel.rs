@@ -367,9 +367,7 @@ fn the_x3s_side_keys_are_pressable() {
         ("Next", Button::PageForward, true),
     ] {
         let button = bezel
-            .buttons
-            .iter()
-            .find(|button| button.label == label)
+            .button_labelled(label)
             .unwrap_or_else(|| panic!("the X3 has a {label} key"));
 
         let at = layout.to_window(button.centre);
