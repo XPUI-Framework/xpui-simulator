@@ -353,11 +353,17 @@ backend.with_display(|frame| {
 Input goes in the same way the simulator feeds it — `backend.begin_frame(ms)`,
 `backend.press(Button::Confirm)`, `app.tick()` — so a test can press a button and
 render what came back.
+[`examples/gallery/tests/typeface.rs`](../../../../examples/gallery/tests/typeface.rs)
+is the shortest worked example of the assertion above.
 [`examples/gallery/tests/screenshots.rs`](../../../../examples/gallery/tests/screenshots.rs)
-is the worked example: it shoots every gallery screen and compares each one
-against a PNG committed in `tests/screenshots/`, pixel for pixel. A mismatch
-writes `target/diff/<name>.png` — expected, actual and the differences, side by
-side.
+is the fuller one: it pairs goldens with `ink_in` checks like the one beside
+the assertion above, and runs the pair across `Board::ALL` — nine screens on
+seven panels, each against a PNG committed as `<screen>_<board slug>.png`,
+pixel for pixel. That one calls `check_screenshot` rather than
+`assert_screenshot`, the same comparison handing its report back instead of
+panicking with it, so a run names every board that moved rather than the first.
+A mismatch writes `target/diff/<name>.png` either way — expected, actual and
+the differences, side by side.
 
 `frame.write_bmp("name")` and `frame.thumbnail(60)` are still there for looking
 at a frame that has no golden. Nothing compares either of them, so do not pair
