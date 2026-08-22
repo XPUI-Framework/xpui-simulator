@@ -8,7 +8,8 @@
 use std::path::{Path, PathBuf};
 
 use embedded_graphics::prelude::*;
-use xpui_eg::{Backend, Framebuffer};
+use xpui_eg::Backend;
+use xpui_screenshot::Framebuffer;
 
 use crate::panel::PanelDisplay;
 
@@ -37,8 +38,7 @@ fn copy_out(display: &mut PanelDisplay) -> Framebuffer {
             // `is_on` is ink, because the simulator installs `INK_IS_ON`. A
             // backend built with the other polarity would come out inverted,
             // and this is the one line that would have to know.
-            frame.pixels[(y * frame.width + x) as usize] =
-                display.get_pixel(Point::new(x, y)).is_on();
+            frame.set(x, y, display.get_pixel(Point::new(x, y)).is_on());
         }
     }
     frame
@@ -60,5 +60,5 @@ fn next_name(dir: &Path, slug: &str) -> String {
 /// The same rule the framebuffer's own writer follows, so a screenshot taken
 /// from the window and one taken from a test land in the same place.
 pub fn directory() -> PathBuf {
-    xpui_eg::framebuffer::screenshot_dir()
+    xpui_screenshot::framebuffer::screenshot_dir()
 }

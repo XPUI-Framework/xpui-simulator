@@ -334,7 +334,8 @@ simulator involved:
 #     fn body(&self) -> impl View<()> { NavigationScreen::new(vstack![0; Text::new("hello")]) }
 #     fn update(&mut self, _: ()) {}
 # }
-use xpui_eg::{assert_screenshot, Backend, Framebuffer, Palette};
+use xpui_eg::{Backend, Palette};
+use xpui_screenshot::{Framebuffer, assert_screenshot};
 
 let backend = Backend::leak(
     Framebuffer::new(480, 800),

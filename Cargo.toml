@@ -17,10 +17,14 @@ crate-type = ["rlib"]
 [dependencies]
 xpui.workspace = true
 xpui-boards.workspace = true
-# `framebuffer` for the screenshot key: it is the BMP writer the screenshot
-# tests already use, and a second one here would be a second thing to get
-# wrong. Host-only, which this crate is anyway — it links SDL.
-xpui-embedded-graphics = { workspace = true, features = ["framebuffer"] }
+# The backend it installs. No screenshot feature any more: the BMP writer it
+# uses for the screenshot key lives in `xpui-screenshot`, which does not drag
+# a PNG codec in behind it.
+xpui-embedded-graphics.workspace = true
+# `Framebuffer::new` and `write_bmp_in`, for the screenshot key. Without
+# `golden`, because `write_bmp_in` hand-writes a BITMAPINFOHEADER and needs no
+# image codec — carrying one here was the cost that split this crate out.
+xpui-screenshot.workspace = true
 embedded-graphics = "0.8"
 embedded-graphics-simulator = "0.8"
 
