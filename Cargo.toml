@@ -17,6 +17,9 @@ crate-type = ["rlib"]
 [dependencies]
 xpui.workspace = true
 xpui-boards.workspace = true
+# The chrome it wires into a backend. The simulator stands in for a firmware,
+# and a firmware is what chooses measurements and words for its panel.
+xpui-chrome.workspace = true
 # The backend it installs. No screenshot feature any more: the BMP writer it
 # uses for the screenshot key lives in `xpui-screenshot`, which does not drag
 # a PNG codec in behind it.

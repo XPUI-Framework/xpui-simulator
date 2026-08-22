@@ -16,7 +16,8 @@ use embedded_graphics::geometry::Size as PixelSize;
 
 use xpui::Point;
 use xpui_boards::Board;
-use xpui_eg::{Backend, Palette};
+use xpui_chrome::{Labels, Metrics};
+use xpui_eg::{Backend, Fonts, Palette};
 
 use crate::controls::Control;
 use crate::layout::BezelLayout;
@@ -215,7 +216,22 @@ impl Session {
                 // with 480x800 chrome shows no list rows at all.
                 let display =
                     PanelDisplay::new(PixelSize::new(board.width as u32, board.height as u32));
-                let backend = Backend::leak_for_board(display, board, Palette::INK_IS_ON);
+                // The simulator stands in for a firmware, so it wires a
+                // backend the way one does: measurements and words from the
+                // panel, keys and the Left/Right pair from the hardware.
+                let metrics = Metrics::for_device(
+                    board.width,
+                    board.height,
+                    board.ui_scale_percent,
+                    !board.touch,
+                );
+                let backend = Backend::new(display, Palette::INK_IS_ON)
+                    .with_metrics(metrics)
+                    .with_labels(Labels::for_panel(board.width, board.height))
+                    .with_keys(board.keys)
+                    .with_left_right_keys(board.has_left_right_keys())
+                    .with_fonts(Fonts::for_metrics(&metrics))
+                    .leaked();
                 self.built += 1;
                 self.panels[self.index] = Some(backend);
                 backend
