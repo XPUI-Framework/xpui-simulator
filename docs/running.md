@@ -41,16 +41,22 @@ Opening a screen of your own instead:
 #     fn body(&self) -> impl View<()> { NavigationScreen::new(vstack![0; Text::new("hello")]) }
 #     fn update(&mut self, _: ()) {}
 # }
-use xpui_simulator::{Panel, Simulator};
+use xpui_simulator::{Board, Panel, Simulator};
 
 fn main() {
-    Simulator::new(Panel::DEFAULT).title("my reader").run(MyScreen::new());
+    Simulator::new(Panel::of(Board::X4)).title("my reader").run(MyScreen::new());
 }
 ```
 
-`Panel::DEFAULT` is the X4: 800 × 480 at 1:1. `Panel::of(board)` gives any
-other device its own size and a scale that keeps the window within reach of a
-laptop display — a 296 × 128 strip at 1:1 is a postage stamp, so it is tripled.
+There is no default panel: this crate knows no devices, so a caller names one.
+`Panel::of(board)` gives that device its own size and a scale that keeps the
+window within reach of a laptop display. The X4 is 480 × 800 held portrait, and
+big enough to show at 1:1; a 296 × 128 strip at 1:1 is a postage stamp, so it
+is tripled.
+
+The board keys walk one board by default: the one the panel was opened on.
+`Simulator::boards(&[..])` is how an application offers more, in its own order.
+`examples/gallery/src/main.rs` passes all seven.
 
 `Panel::of(..).scaled(n)` overrides that. Scale is a window concern: doubling
 every panel pixel changes nothing about what the screen is laid out against.

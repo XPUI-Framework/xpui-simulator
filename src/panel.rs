@@ -33,10 +33,6 @@ pub struct Panel {
 }
 
 impl Panel {
-    /// The default when no board is named. A real device rather than a
-    /// placeholder, so what opens is something that exists.
-    pub const DEFAULT: Panel = Panel::of(Board::X4);
-
     /// The panel a [`Board`] has.
     ///
     /// The board is the shared description a firmware reads too, so a screen

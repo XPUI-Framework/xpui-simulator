@@ -9,7 +9,7 @@ use embedded_graphics_simulator::{MultiWindow, OutputSettings, SimulatorDisplay,
 
 use xpui::screen::Screen;
 use xpui::{App, Point, SwipeDir};
-use xpui_boards::KeyAction;
+use xpui_boards::{Board, KeyAction};
 
 use crate::click::{Hit, route};
 use crate::controls::{Control, control_for};
@@ -24,6 +24,7 @@ use crate::touch::Touchscreen;
 /// A window, a backend, and the loop between them.
 pub struct Simulator {
     panel: Panel,
+    boards: Vec<Board>,
     title: String,
     max_frames: Option<u32>,
     keys: Box<dyn Keys>,
@@ -33,10 +34,21 @@ impl Simulator {
     pub fn new(panel: Panel) -> Self {
         Simulator {
             panel,
+            boards: vec![panel.board],
             title: String::from("xpui"),
             max_frames: None,
             keys: Box::new(Raw),
         }
+    }
+
+    /// The boards the board keys cycle through, in order.
+    ///
+    /// Left unset, the cycle is the one board the [`Panel`] was opened on.
+    /// See [`Session::cycling`] for why that is the default and what happens
+    /// to a list that leaves the panel's own board out.
+    pub fn boards(mut self, boards: &[Board]) -> Self {
+        self.boards = boards.to_vec();
+        self
     }
 
     pub fn title(mut self, title: impl Into<String>) -> Self {
@@ -68,9 +80,19 @@ impl Simulator {
         self
     }
 
+    /// The [`Session`] [`run`](Simulator::run) will drive.
+    ///
+    /// Public because `run` opens a window and pumps SDL until someone closes
+    /// it, so nothing about it can be asserted on a CI machine. This is the
+    /// part that can: everything the builder was told, resolved into the thing
+    /// that answers key presses.
+    pub fn session(&self) -> Session {
+        Session::cycling(self.panel, &self.boards)
+    }
+
     /// Runs `root` until the app finishes or the window closes.
     pub fn run<S: Screen + 'static>(self, root: S) {
-        let mut session = Session::new(self.panel);
+        let mut session = self.session();
         let (window_width, window_height) = session.window_size();
 
         let mut window = MultiWindow::new(
@@ -323,4 +345,37 @@ impl Simulator {
 /// Whether either shift key was down.
 fn shifted(keymod: Mod) -> bool {
     keymod.intersects(Mod::LSHIFTMOD | Mod::RSHIFTMOD)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use xpui_boards::Board;
+
+    /// The builder keeps what it was handed.
+    ///
+    /// A unit test rather than one in `tests/`, because it reads a private
+    /// field. Without it `boards` can drop its argument on the floor and every
+    /// integration test still passes: they all build a [`Session`] directly.
+    #[test]
+    fn the_builder_keeps_the_list_it_was_given() {
+        let mine = Board::custom("mine", 400, 300, false);
+        let simulator = Simulator::new(Panel::of(mine));
+        assert_eq!(
+            simulator.boards,
+            vec![mine],
+            "unset, the cycle is the panel's own board"
+        );
+
+        // Described here rather than taken from `xpui-boards`' presets: this
+        // crate names no device, and a list of three panels proves the order
+        // is kept whatever is on them.
+        let three = [
+            Board::custom("first", 400, 300, false),
+            Board::custom("second", 296, 128, false),
+            Board::custom("third", 480, 800, true),
+        ];
+        let simulator = Simulator::new(Panel::of(three[0])).boards(&three);
+        assert_eq!(simulator.boards, three, "and it is the caller's, in order");
+    }
 }

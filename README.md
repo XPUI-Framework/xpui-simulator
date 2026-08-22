@@ -12,10 +12,10 @@ developed without hardware.
 #     fn body(&self) -> impl View<()> { Text::new("Main menu") }
 #     fn update(&mut self, _message: ()) {}
 # }
-use xpui_simulator::{Panel, Simulator};
+use xpui_simulator::{Board, Panel, Simulator};
 
 fn main() {
-    Simulator::new(Panel::DEFAULT)
+    Simulator::new(Panel::of(Board::X4))
         .title("my reader")
         .run(MainMenu::new());
 }
@@ -79,10 +79,14 @@ how a board with fewer keys than jobs finds a Back it has no room for. See [`doc
 
 | Key | |
 |---|---|
-| B, Shift+B | the next board, or the previous one |
+| B, Shift+B | the next board in the cycle you supplied, or the previous one |
 | + / - | zoom in and out |
 | E | show or hide the device body |
 | S | write the panel to `target/screenshots/` |
+
+**`B` walks the cycle you supplied.** This crate has no device list of its own:
+`Simulator::boards(&[..])` is how you give it one, and the snippet above gives
+it none, so `B` does nothing there. `examples/gallery/src/main.rs` passes seven.
 
 **The screen stack survives a board switch**: the screen you had navigated to is
 re-measured against the new panel and painted on it, which is the point — every

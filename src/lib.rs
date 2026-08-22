@@ -9,6 +9,7 @@
 //!
 //! ```rust,no_run
 //! # use xpui::{NavigationScreen, Screen, Text, View, vstack};
+//! # use xpui_simulator::Board;
 //! # use xpui_simulator::{Panel, Simulator};
 //! # struct MainMenu;
 //! # impl MainMenu { fn new() -> Self { MainMenu } }
@@ -18,7 +19,12 @@
 //! #     fn update(&mut self, _message: ()) {}
 //! # }
 //! fn main() {
-//!     Simulator::new(Panel::DEFAULT).run(MainMenu::new());
+//!     // Whichever device you are developing for. This crate has no default
+//!     // one and no list of its own: it opens whatever board it is handed.
+//!     // `xpui-boards` carries seven ready-made presets, and `Board::custom`
+//!     // describes anything else.
+//!     let mine = Board::custom("my reader", 480, 800, false);
+//!     Simulator::new(Panel::of(mine)).run(MainMenu::new());
 //! }
 //! ```
 //!
@@ -49,15 +55,19 @@
 //!
 //! | Key | |
 //! |---|---|
-//! | B / Shift+B | the next board, or the previous one |
+//! | B / Shift+B | the next board in the caller's cycle, or the previous one |
 //! | + / - | zoom in and out |
 //! | E | show or hide the device body |
 //! | S | write the panel to `target/screenshots/` |
 //!
+//! **`B` walks the cycle its caller supplied**, and the example above supplied
+//! one board, so it does nothing there. [`Simulator::boards`] is where an
+//! application offers more; `examples/gallery/src/main.rs` offers seven.
+//!
 //! The screen stack survives a board switch: the same screen you had navigated
 //! to is re-measured against the new panel and painted on it, which is the
-//! whole point — six panels without six runs, and without navigating back to
-//! the screen you wanted to look at each time.
+//! whole point — every panel without a run each, and without navigating back
+//! to the screen you wanted to look at each time.
 //!
 //! The window itself never changes size. It is opened once, large enough for
 //! the largest board any of these keys can reach, and every smaller one is

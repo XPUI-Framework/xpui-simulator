@@ -13,7 +13,7 @@ use std::sync::{Mutex, MutexGuard};
 use embedded_graphics::prelude::*;
 
 use xpui::{App, Divider, Renderer, Screen, Size, View, vstack};
-use xpui_simulator::{Board, Control, Panel, PanelDisplay, Session};
+use xpui_simulator::{Board, Control, Panel, PanelDisplay, Session, Simulator};
 
 /// `xpui::host::install` writes a static, and Cargo runs tests in parallel.
 static SERIAL: Mutex<()> = Mutex::new(());
@@ -97,7 +97,7 @@ fn switching_board_keeps_the_screen_stack_and_re_measures_it() {
     let _guard = serial();
 
     let start = Board::TUFTY_2040;
-    let mut session = Session::new(Panel::of(start));
+    let mut session = Session::cycling(Panel::of(start), &Board::ALL);
     let mut app = App::new(OneRule);
     app.push(ThreeRules);
     app.render();
@@ -164,7 +164,7 @@ fn switching_board_keeps_the_screen_stack_and_re_measures_it() {
 fn cycling_the_boards_reuses_their_backends() {
     let _guard = serial();
 
-    let mut session = Session::new(Panel::DEFAULT);
+    let mut session = Session::cycling(Panel::of(Board::X4), &Board::ALL);
     for _ in 0..Board::ALL.len() * 2 {
         session.apply(Control::NextBoard);
     }
@@ -183,7 +183,7 @@ fn cycling_the_boards_reuses_their_backends() {
 fn shift_walks_the_boards_the_other_way() {
     let _guard = serial();
 
-    let mut session = Session::new(Panel::DEFAULT);
+    let mut session = Session::cycling(Panel::of(Board::X4), &Board::ALL);
     let start = session.board();
 
     session.apply(Control::NextBoard);
@@ -209,8 +209,10 @@ fn shift_walks_the_boards_the_other_way() {
 fn zoom_does_not_change_the_panel() {
     let _guard = serial();
 
-    // The Badger opens tripled, so it has room to zoom out and back.
-    let mut session = Session::new(Panel::of(Board::BADGER_2040));
+    // The Badger opens tripled, so it has room to zoom out and back. Over the
+    // full cycle, because the window is sized for the largest board any key
+    // can reach and this test is about what the window allows.
+    let mut session = Session::cycling(Panel::of(Board::BADGER_2040), &Board::ALL);
     let mut app = App::new(OneRule);
     app.render();
 
@@ -242,7 +244,9 @@ fn zoom_does_not_change_the_panel() {
 fn zoom_is_clamped_at_both_ends() {
     let _guard = serial();
 
-    let mut session = Session::new(Panel::of(Board::BADGER_2040));
+    // The full cycle: the ceiling this asserts against is derived from the
+    // window, and the window is sized over every board the keys can reach.
+    let mut session = Session::cycling(Panel::of(Board::BADGER_2040), &Board::ALL);
     for _ in 0..12 {
         session.apply(Control::ZoomOut);
     }
@@ -272,7 +276,7 @@ fn zoom_is_clamped_at_both_ends() {
 fn nothing_ever_outgrows_the_window() {
     let _guard = serial();
 
-    let mut session = Session::new(Panel::DEFAULT);
+    let mut session = Session::cycling(Panel::of(Board::X4), &Board::ALL);
     let (window_width, window_height) = session.window_size();
 
     for _ in 0..Board::ALL.len() * 2 {
@@ -299,7 +303,7 @@ fn nothing_ever_outgrows_the_window() {
 fn the_panel_stays_centred() {
     let _guard = serial();
 
-    let mut session = Session::new(Panel::DEFAULT);
+    let mut session = Session::cycling(Panel::of(Board::X4), &Board::ALL);
     let (window_width, window_height) = session.window_size();
 
     for _ in 0..Board::ALL.len() {
@@ -330,7 +334,7 @@ fn the_panel_stays_centred() {
 fn hiding_the_body_letterboxes_rather_than_resizes() {
     let _guard = serial();
 
-    let mut session = Session::new(Panel::of(Board::X4));
+    let mut session = Session::cycling(Panel::of(Board::X4), &Board::ALL);
     let window = session.window_size();
     let with_body = session.shown_size();
     assert!(session.body_shown() && session.layout().is_some());
@@ -357,8 +361,11 @@ fn hiding_the_body_letterboxes_rather_than_resizes() {
 fn a_board_of_someone_elses_is_carried_too() {
     let _guard = serial();
 
+    // A cycle that does not contain it. The panel is opened on it anyway, so
+    // it has to be appended rather than dropped — otherwise the first press of
+    // B leaves the window showing a board the cycle cannot return to.
     let odd = Board::custom("odd", 1100, 200, false);
-    let mut session = Session::new(Panel::of(odd));
+    let mut session = Session::cycling(Panel::of(odd), &Board::ALL);
 
     let (width, height) = session.window_size();
     assert!(
@@ -372,4 +379,78 @@ fn a_board_of_someone_elses_is_carried_too() {
         seen |= session.board() == odd;
     }
     assert!(seen, "it is still in the cycle a full lap later");
+}
+
+/// A caller that named one board gets a cycle of one, and `B` does nothing.
+///
+/// This is the default, and it is the whole of spec 38: before it, opening a
+/// window on one panel put six commercial devices nobody asked for behind the
+/// `B` key. A press that silently swaps the panel for somebody else's is worse
+/// than a press that does nothing, because the window keeps painting and the
+/// numbers underneath it changed.
+#[test]
+fn a_caller_that_named_one_board_cycles_through_one() {
+    let _guard = serial();
+
+    let mine = Board::custom("mine", 400, 300, false);
+    let mut session = Session::new(Panel::of(mine));
+
+    assert_eq!(session.board(), mine);
+    assert!(
+        !session.apply(Control::NextBoard),
+        "there is nowhere to go, so B is not a change"
+    );
+    assert_eq!(session.board(), mine, "and it did not go there anyway");
+    assert!(!session.apply(Control::PreviousBoard));
+    assert_eq!(session.board(), mine);
+}
+
+/// And a caller that named three cycles through exactly those three, in order.
+///
+/// Without this the test above passes against a [`Session`] that ignores its
+/// list entirely and always cycles the panel's own board.
+#[test]
+fn a_caller_that_named_three_cycles_through_those_three() {
+    let _guard = serial();
+
+    let three = [Board::TUFTY_2040, Board::X4, Board::BADGER_2040];
+    let mut session = Session::cycling(Panel::of(three[0]), &three);
+
+    let mut walked = vec![session.board()];
+    for _ in 0..2 {
+        assert!(session.apply(Control::NextBoard), "the cycle moves on");
+        walked.push(session.board());
+    }
+    assert_eq!(walked, three, "the caller's list, in the caller's order");
+
+    assert!(session.apply(Control::NextBoard));
+    assert_eq!(session.board(), three[0], "and it wraps");
+}
+
+/// A `Simulator` hands its board list to the session it drives.
+///
+/// The hop the builder's own unit test cannot reach: `boards` can keep a list
+/// perfectly and `run` still walk a different one. Every other test in this
+/// file builds a [`Session`] directly and so jumps straight over the two lines
+/// where an application's list actually becomes a cycle.
+#[test]
+fn a_simulators_list_reaches_the_session_it_drives() {
+    let _guard = serial();
+
+    let three = [
+        Board::custom("first", 400, 300, false),
+        Board::custom("second", 296, 128, false),
+        Board::custom("third", 480, 800, true),
+    ];
+    let mut session = Simulator::new(Panel::of(three[0])).boards(&three).session();
+
+    let mut walked = vec![session.board()];
+    for _ in 0..2 {
+        assert!(session.apply(Control::NextBoard), "the cycle moves on");
+        walked.push(session.board());
+    }
+    assert_eq!(
+        walked, three,
+        "the simulator walked a cycle its caller did not ask for"
+    );
 }

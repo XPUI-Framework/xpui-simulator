@@ -14,7 +14,7 @@ use embedded_graphics_simulator::sdl2::Keycode;
 /// What a control key does to the window.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Control {
-    /// Show the next board in `Board::ALL`, wrapping.
+    /// Show the next board in the cycle the caller supplied, wrapping.
     NextBoard,
     /// Show the previous one.
     PreviousBoard,

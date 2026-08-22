@@ -61,14 +61,31 @@ pub struct Session {
 
 impl Session {
     /// Opens on `panel`, and installs the backend behind it.
+    ///
+    /// The cycle is that one board. This crate knows no devices — it is handed
+    /// one — so a list of somebody else's is not a defensible default, and an
+    /// empty cycle is not one either: the panel on screen is always somewhere
+    /// the board keys can be.
+    ///
+    /// [`cycling`](Session::cycling) is how a caller offers more.
     pub fn new(panel: Panel) -> Session {
-        let mut boards: Vec<Board> = Board::ALL.into();
+        Session::cycling(panel, &[panel.board])
+    }
+
+    /// Opens on `panel`, with `boards` as the cycle the board keys walk.
+    ///
+    /// The order is the caller's, and so is the membership: an application
+    /// simulating one panel nobody here has heard of gets the same window and
+    /// the same keys as one offering seven.
+    pub fn cycling(panel: Panel, boards: &[Board]) -> Session {
+        let mut boards: Vec<Board> = boards.to_vec();
         let index = match boards.iter().position(|board| *board == panel.board) {
             Some(index) => index,
             None => {
-                // A board of somebody else's — `Board::custom`, or a preset
-                // this crate has never heard of. It joins the cycle rather
-                // than being replaced by the first press of B.
+                // The panel was opened on a board the list does not hold. It
+                // joins the cycle rather than being replaced by the first
+                // press of B, which is what would otherwise happen: the window
+                // is showing something the caller cannot get back to.
                 boards.push(panel.board);
                 boards.len() - 1
             }
@@ -88,6 +105,16 @@ impl Session {
     }
 
     /// The board on screen.
+    /// The cycle the board keys walk, in order.
+    ///
+    /// So an application can say at startup what `B` will do, the way a
+    /// firmware says which board it booted on. A window that opens on the
+    /// right panel and cycles the wrong list is otherwise something you find
+    /// by pressing a key.
+    pub fn boards(&self) -> &[Board] {
+        &self.boards
+    }
+
     pub fn board(&self) -> Board {
         self.boards[self.index]
     }
