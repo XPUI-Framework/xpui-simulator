@@ -12,7 +12,7 @@ use embedded_graphics::geometry::Point as WindowPoint;
 use embedded_graphics::pixelcolor::Rgb888;
 use embedded_graphics_simulator::{MultiWindow, SimulatorDisplay};
 
-use xpui_boards::KeyAction;
+use xpui_boards_core::KeyAction;
 use xpui_eg::Backend;
 
 use crate::panel::{PanelDisplay, window_settings};

@@ -7,9 +7,13 @@
 //! cannot physically have.
 
 use xpui::{Button, Point};
-use xpui_boards::KeyAction;
-use xpui_boards::{Bezel, Board};
+use xpui_boards_core::KeyAction;
+use xpui_boards_core::{Bezel, Board};
+use xpui_boards_pimoroni as pimoroni;
+use xpui_boards_xteink as xteink;
 use xpui_simulator::{BezelLayout, Hit, Panel, route};
+
+mod devices;
 
 /// What `MultiWindow` reports for a raw window position.
 ///
@@ -38,7 +42,7 @@ fn what_the_window_reports(
 
 /// Every board that has described its body, with the window it would open.
 fn bezelled() -> impl Iterator<Item = (Board, Panel, BezelLayout)> {
-    Board::ALL.into_iter().filter_map(|board| {
+    devices::ALL.into_iter().filter_map(|board| {
         let panel = Panel::of(board);
         let layout = board
             .bezel
@@ -269,7 +273,7 @@ fn a_click_off_the_panel_is_never_delivered_as_a_touch() {
 /// nothing about where anything is on it.
 #[test]
 fn scaling_grows_the_body_without_moving_a_key() {
-    let board = Board::BADGER_2040;
+    let board = pimoroni::BADGER_2040;
     let bezel = board.bezel.expect("the Badger has a bezel");
 
     let mut previous: Option<(i32, i32)> = None;
@@ -354,8 +358,8 @@ fn a_board_with_no_bezel_is_all_panel() {
 /// reach the firmware as those buttons.
 #[test]
 fn the_x3s_side_keys_are_pressable() {
-    let panel = Panel::of(Board::X3);
-    let bezel = Board::X3.bezel.expect("the X3 has a bezel");
+    let panel = Panel::of(xteink::X3);
+    let bezel = xteink::X3.bezel.expect("the X3 has a bezel");
     let layout = BezelLayout::new(bezel, panel.width, panel.height, panel.scale);
     let inset = layout.panel_offset();
     let (panel_width, _) = layout.panel_size();

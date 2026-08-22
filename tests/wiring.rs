@@ -18,7 +18,9 @@ use std::sync::{Mutex, MutexGuard};
 
 use xpui::screen::Screen;
 use xpui::{Button, NavigationScreen, Text, View, vstack};
-use xpui_simulator::{Board, Keys, Panel, Press, Simulator};
+use xpui_boards_pimoroni as pimoroni;
+use xpui_boards_xteink as xteink;
+use xpui_simulator::{Keys, Panel, Press, Simulator};
 
 /// One at a time: `Simulator::run` installs the process-wide host, and these
 /// count through statics.
@@ -81,7 +83,7 @@ fn the_loop_asks_the_keys_it_was_given_for_anything_due() {
     headless();
     DUE_ASKED.store(0, Ordering::Relaxed);
 
-    Simulator::new(Panel::of(Board::BADGER_2040))
+    Simulator::new(Panel::of(pimoroni::BADGER_2040))
         .frames(FRAMES)
         .keys(Counting)
         .run(Blank);
@@ -105,12 +107,12 @@ fn the_keys_the_caller_supplied_are_the_ones_installed() {
     headless();
     DUE_ASKED.store(0, Ordering::Relaxed);
 
-    Simulator::new(Panel::of(Board::X4))
+    Simulator::new(Panel::of(xteink::X4))
         .frames(FRAMES)
         .run(Blank);
     let without = DUE_ASKED.load(Ordering::Relaxed);
 
-    Simulator::new(Panel::of(Board::X4))
+    Simulator::new(Panel::of(xteink::X4))
         .frames(FRAMES)
         .keys(Counting)
         .run(Blank);

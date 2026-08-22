@@ -15,7 +15,11 @@ developed without hardware.
 use xpui_simulator::{Board, Panel, Simulator};
 
 fn main() {
-    Simulator::new(Panel::of(Board::X4))
+    // Your panel. `xpui-boards-pimoroni`, `-xteink` and `-seeed` carry
+    // ready-made ones; this crate knows no device and opens whatever it is
+    // handed.
+    let mine = Board::custom("my reader", 480, 800, false);
+    Simulator::new(Panel::of(mine))
         .title("my reader")
         .run(MainMenu::new());
 }

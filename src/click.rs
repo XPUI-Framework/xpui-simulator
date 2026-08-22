@@ -9,7 +9,7 @@
 //! remember.
 
 use xpui::Point;
-use xpui_boards::KeyAction;
+use xpui_boards_core::KeyAction;
 
 use crate::layout::BezelLayout;
 

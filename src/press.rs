@@ -21,7 +21,7 @@
 //! things and they read differently at the call site.
 
 use xpui::Button;
-use xpui_boards::Board;
+use xpui_boards_core::Board;
 use xpui_eg::Backend;
 
 use crate::panel::PanelDisplay;

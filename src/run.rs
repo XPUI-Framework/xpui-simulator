@@ -9,7 +9,7 @@ use embedded_graphics_simulator::{MultiWindow, OutputSettings, SimulatorDisplay,
 
 use xpui::screen::Screen;
 use xpui::{App, Point, SwipeDir};
-use xpui_boards::{Board, KeyAction};
+use xpui_boards_core::{Board, KeyAction};
 
 use crate::click::{Hit, route};
 use crate::controls::{Control, control_for};
@@ -350,7 +350,7 @@ fn shifted(keymod: Mod) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use xpui_boards::Board;
+    use xpui_boards_core::Board;
 
     /// The builder keeps what it was handed.
     ///
@@ -367,7 +367,7 @@ mod tests {
             "unset, the cycle is the panel's own board"
         );
 
-        // Described here rather than taken from `xpui-boards`' presets: this
+        // Described here rather than taken from a vendor crate's presets: this
         // crate names no device, and a list of three panels proves the order
         // is kept whatever is on them.
         let three = [

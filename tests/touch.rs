@@ -9,8 +9,11 @@
 //! opens a window or needs SDL.
 
 use xpui::{Point, SwipeDir};
-use xpui_boards::Board;
+use xpui_boards_core::Board;
+use xpui_boards_pimoroni as pimoroni;
 use xpui_simulator::{EdgeGesture, Touch, Touchscreen};
+
+mod devices;
 
 /// A touch panel 480x800, which makes the edge bands 120 px at the sides and
 /// 112 px top and bottom.
@@ -423,9 +426,9 @@ fn a_perfect_diagonal_from_a_corner_is_no_edge_gesture_at_all() {
 fn a_board_with_no_touchscreen_reports_nothing_at_all() {
     // The premise, checked where it is written down. If the Badger ever grows
     // a touchscreen this stops compiling, rather than passing vacuously.
-    const _: () = assert!(!Board::BADGER_2040.touch);
+    const _: () = assert!(!pimoroni::BADGER_2040.touch);
 
-    let mut badger = Touchscreen::for_board(Board::BADGER_2040);
+    let mut badger = Touchscreen::for_board(pimoroni::BADGER_2040);
 
     let down = Point::new(100, 60);
     assert!(badger.down(down, 0).is_empty(), "a click became a touch");
@@ -447,7 +450,7 @@ fn a_board_with_no_touchscreen_reports_nothing_at_all() {
 /// And every other board that has said the same thing about itself.
 #[test]
 fn no_board_without_touch_classifies_anything() {
-    for board in Board::ALL.into_iter().filter(|board| !board.touch) {
+    for board in devices::ALL.into_iter().filter(|board| !board.touch) {
         let mut screen = Touchscreen::for_board(board);
         let middle = Point::new(board.width / 2, board.height / 2);
 
@@ -467,7 +470,7 @@ fn no_board_without_touch_classifies_anything() {
 /// still pass with the classifier deleted.
 #[test]
 fn a_board_with_a_touchscreen_reports_everything() {
-    for board in Board::ALL.into_iter().filter(|board| board.touch) {
+    for board in devices::ALL.into_iter().filter(|board| board.touch) {
         let mut screen = Touchscreen::for_board(board);
         let middle = Point::new(board.width / 2, board.height / 2);
 

@@ -6,7 +6,11 @@
 //! simulator rebuilt the board from its width and height, discarding the name,
 //! the refresh time and whether the device had a touchscreen.
 
+use xpui_boards_pimoroni as pimoroni;
+use xpui_boards_xteink as xteink;
 use xpui_simulator::{Board, Panel};
+
+mod devices;
 
 /// The whole window, body included — not the panel times the scale.
 ///
@@ -27,7 +31,7 @@ fn window(panel: Panel) -> (i32, i32) {
 /// than that the result is small.
 #[test]
 fn the_scale_is_the_largest_that_fits() {
-    for board in Board::ALL {
+    for board in devices::ALL {
         let panel = Panel::of(board);
         assert!(panel.scale >= 1, "{}: scale below life size", board.name);
 
@@ -59,12 +63,12 @@ fn the_scale_is_the_largest_that_fits() {
 #[test]
 fn a_small_panel_is_scaled_up_and_a_large_one_is_not() {
     assert_eq!(
-        Panel::of(Board::BADGER_2040).scale,
+        Panel::of(pimoroni::BADGER_2040).scale,
         3,
         "a 296x128 strip at 1:1 is a postage stamp"
     );
     assert_eq!(
-        Panel::of(Board::X4).scale,
+        Panel::of(xteink::X4).scale,
         1,
         "an 800x480 panel is already a reasonable window"
     );
@@ -73,7 +77,7 @@ fn a_small_panel_is_scaled_up_and_a_large_one_is_not() {
 /// Scaling must consider width, not height alone.
 ///
 /// The four real boards cannot show this: every one of them gets the same
-/// scale either way, so a test over `Board::ALL` passes with the width clause
+/// scale either way, so a test over `devices::ALL` passes with the width clause
 /// deleted. It takes a panel that is wide and short — where width is the
 /// binding constraint and height is not — for the difference to appear at all.
 #[test]
@@ -95,7 +99,7 @@ fn a_wide_short_panel_is_limited_by_its_width() {
 
 #[test]
 fn the_panel_carries_the_board_it_was_built_from() {
-    for board in Board::ALL {
+    for board in devices::ALL {
         let panel = Panel::of(board);
         assert_eq!(
             panel.board, board,
@@ -110,7 +114,7 @@ fn the_panel_carries_the_board_it_was_built_from() {
 /// with tap-only controls that are unreachable on the hardware.
 #[test]
 fn a_board_without_touch_stays_without_touch() {
-    assert!(!Panel::of(Board::BADGER_2040).board.touch);
+    assert!(!Panel::of(pimoroni::BADGER_2040).board.touch);
 }
 
 /// The gap between panel pixels must be zero.

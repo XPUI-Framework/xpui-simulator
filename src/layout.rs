@@ -10,7 +10,7 @@
 //! millimetre, which is what makes zoom cost no second set of numbers.
 
 use xpui::Point;
-use xpui_boards::{Bezel, KeyAction};
+use xpui_boards_core::{Bezel, KeyAction};
 
 /// A device's body, its panel and its buttons, in window pixels.
 #[derive(Copy, Clone, Debug)]

@@ -16,7 +16,10 @@ crate-type = ["rlib"]
 
 [dependencies]
 xpui.workspace = true
-xpui-boards.workspace = true
+# The vocabulary a device is described in — `Board`, `Bezel`, `KeyAction`. Not
+# a vendor's data: this crate names no device, and the cycle it walks is the
+# one its caller hands it.
+xpui-boards-core.workspace = true
 # The chrome it wires into a backend. The simulator stands in for a firmware,
 # and a firmware is what chooses measurements and words for its panel.
 xpui-chrome.workspace = true
@@ -34,6 +37,11 @@ embedded-graphics = "0.8"
 embedded-graphics-simulator = "0.8"
 
 [dev-dependencies]
+# Real devices, for tests only. A test needs bodies with keys on them to be
+# worth anything, and a dev-dependency does not reach a consumer.
+xpui-boards-pimoroni.workspace = true
+xpui-boards-seeed.workspace = true
+xpui-boards-xteink.workspace = true
 # The guide shows how to screenshot a screen without a window, and that block
 # is compiled rather than taken on trust.
 xpui = { workspace = true, features = ["testing"] }

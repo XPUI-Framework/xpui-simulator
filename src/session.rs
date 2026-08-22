@@ -15,7 +15,7 @@
 use embedded_graphics::geometry::Size as PixelSize;
 
 use xpui::Point;
-use xpui_boards::Board;
+use xpui_boards_core::Board;
 use xpui_chrome::{Labels, Metrics};
 use xpui_eg::{Backend, Fonts, Palette};
 

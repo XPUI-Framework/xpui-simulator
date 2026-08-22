@@ -13,7 +13,11 @@ use std::sync::{Mutex, MutexGuard};
 use embedded_graphics::prelude::*;
 
 use xpui::{App, Divider, Renderer, Screen, Size, View, vstack};
+use xpui_boards_pimoroni as pimoroni;
+use xpui_boards_xteink as xteink;
 use xpui_simulator::{Board, Control, Panel, PanelDisplay, Session, Simulator};
+
+mod devices;
 
 /// `xpui::host::install` writes a static, and Cargo runs tests in parallel.
 static SERIAL: Mutex<()> = Mutex::new(());
@@ -96,8 +100,8 @@ fn rows(display: &PanelDisplay) -> Vec<i32> {
 fn switching_board_keeps_the_screen_stack_and_re_measures_it() {
     let _guard = serial();
 
-    let start = Board::TUFTY_2040;
-    let mut session = Session::cycling(Panel::of(start), &Board::ALL);
+    let start = pimoroni::TUFTY_2040;
+    let mut session = Session::cycling(Panel::of(start), &devices::ALL);
     let mut app = App::new(OneRule);
     app.push(ThreeRules);
     app.render();
@@ -114,7 +118,7 @@ fn switching_board_keeps_the_screen_stack_and_re_measures_it() {
         "a rule spans the panel it was measured against"
     );
 
-    for _ in 0..Board::ALL.len() {
+    for _ in 0..devices::ALL.len() {
         assert!(
             session.apply(Control::NextBoard),
             "the next board is a change"
@@ -164,17 +168,17 @@ fn switching_board_keeps_the_screen_stack_and_re_measures_it() {
 fn cycling_the_boards_reuses_their_backends() {
     let _guard = serial();
 
-    let mut session = Session::cycling(Panel::of(Board::X4), &Board::ALL);
-    for _ in 0..Board::ALL.len() * 2 {
+    let mut session = Session::cycling(Panel::of(xteink::X4), &devices::ALL);
+    for _ in 0..devices::ALL.len() * 2 {
         session.apply(Control::NextBoard);
     }
 
     assert_eq!(
         session.backends_built(),
-        Board::ALL.len(),
+        devices::ALL.len(),
         "two laps built {} backends for {} boards",
         session.backends_built(),
-        Board::ALL.len()
+        devices::ALL.len()
     );
 }
 
@@ -183,7 +187,7 @@ fn cycling_the_boards_reuses_their_backends() {
 fn shift_walks_the_boards_the_other_way() {
     let _guard = serial();
 
-    let mut session = Session::cycling(Panel::of(Board::X4), &Board::ALL);
+    let mut session = Session::cycling(Panel::of(xteink::X4), &devices::ALL);
     let start = session.board();
 
     session.apply(Control::NextBoard);
@@ -212,13 +216,13 @@ fn zoom_does_not_change_the_panel() {
     // The Badger opens tripled, so it has room to zoom out and back. Over the
     // full cycle, because the window is sized for the largest board any key
     // can reach and this test is about what the window allows.
-    let mut session = Session::cycling(Panel::of(Board::BADGER_2040), &Board::ALL);
+    let mut session = Session::cycling(Panel::of(pimoroni::BADGER_2040), &devices::ALL);
     let mut app = App::new(OneRule);
     app.render();
 
     let scale = session.scale();
     let reach = ink_reaches(&session);
-    assert_eq!(reach, Some(Board::BADGER_2040.width - 1));
+    assert_eq!(reach, Some(pimoroni::BADGER_2040.width - 1));
 
     assert!(
         session.apply(Control::ZoomOut),
@@ -229,7 +233,7 @@ fn zoom_does_not_change_the_panel() {
 
     assert_eq!(
         Renderer::screen_size(),
-        Size::new(Board::BADGER_2040.width, Board::BADGER_2040.height),
+        Size::new(pimoroni::BADGER_2040.width, pimoroni::BADGER_2040.height),
         "the panel is the same number of pixels at any scale"
     );
     assert_eq!(
@@ -246,7 +250,7 @@ fn zoom_is_clamped_at_both_ends() {
 
     // The full cycle: the ceiling this asserts against is derived from the
     // window, and the window is sized over every board the keys can reach.
-    let mut session = Session::cycling(Panel::of(Board::BADGER_2040), &Board::ALL);
+    let mut session = Session::cycling(Panel::of(pimoroni::BADGER_2040), &devices::ALL);
     for _ in 0..12 {
         session.apply(Control::ZoomOut);
     }
@@ -276,10 +280,10 @@ fn zoom_is_clamped_at_both_ends() {
 fn nothing_ever_outgrows_the_window() {
     let _guard = serial();
 
-    let mut session = Session::cycling(Panel::of(Board::X4), &Board::ALL);
+    let mut session = Session::cycling(Panel::of(xteink::X4), &devices::ALL);
     let (window_width, window_height) = session.window_size();
 
-    for _ in 0..Board::ALL.len() * 2 {
+    for _ in 0..devices::ALL.len() * 2 {
         // Twice: once with the body shown, once without, ending as it began.
         for _ in 0..2 {
             for _ in 0..12 {
@@ -303,10 +307,10 @@ fn nothing_ever_outgrows_the_window() {
 fn the_panel_stays_centred() {
     let _guard = serial();
 
-    let mut session = Session::cycling(Panel::of(Board::X4), &Board::ALL);
+    let mut session = Session::cycling(Panel::of(xteink::X4), &devices::ALL);
     let (window_width, window_height) = session.window_size();
 
-    for _ in 0..Board::ALL.len() {
+    for _ in 0..devices::ALL.len() {
         for _ in 0..2 {
             let origin = session.origin();
             let (width, height) = session.shown_size();
@@ -334,7 +338,7 @@ fn the_panel_stays_centred() {
 fn hiding_the_body_letterboxes_rather_than_resizes() {
     let _guard = serial();
 
-    let mut session = Session::cycling(Panel::of(Board::X4), &Board::ALL);
+    let mut session = Session::cycling(Panel::of(xteink::X4), &devices::ALL);
     let window = session.window_size();
     let with_body = session.shown_size();
     assert!(session.body_shown() && session.layout().is_some());
@@ -346,7 +350,7 @@ fn hiding_the_body_letterboxes_rather_than_resizes() {
     assert_eq!(session.window_size(), window, "the window cannot resize");
     assert_eq!(
         session.shown_size(),
-        (Board::X4.width, Board::X4.height),
+        (xteink::X4.width, xteink::X4.height),
         "what is left is the bare panel"
     );
     assert!(
@@ -365,7 +369,7 @@ fn a_board_of_someone_elses_is_carried_too() {
     // it has to be appended rather than dropped — otherwise the first press of
     // B leaves the window showing a board the cycle cannot return to.
     let odd = Board::custom("odd", 1100, 200, false);
-    let mut session = Session::cycling(Panel::of(odd), &Board::ALL);
+    let mut session = Session::cycling(Panel::of(odd), &devices::ALL);
 
     let (width, height) = session.window_size();
     assert!(
@@ -374,7 +378,7 @@ fn a_board_of_someone_elses_is_carried_too() {
     );
 
     let mut seen = false;
-    for _ in 0..=Board::ALL.len() {
+    for _ in 0..=devices::ALL.len() {
         session.apply(Control::NextBoard);
         seen |= session.board() == odd;
     }
@@ -413,7 +417,7 @@ fn a_caller_that_named_one_board_cycles_through_one() {
 fn a_caller_that_named_three_cycles_through_those_three() {
     let _guard = serial();
 
-    let three = [Board::TUFTY_2040, Board::X4, Board::BADGER_2040];
+    let three = [pimoroni::TUFTY_2040, xteink::X4, pimoroni::BADGER_2040];
     let mut session = Session::cycling(Panel::of(three[0]), &three);
 
     let mut walked = vec![session.board()];

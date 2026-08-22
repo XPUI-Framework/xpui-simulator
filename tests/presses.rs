@@ -12,7 +12,9 @@ use std::sync::{Mutex, MutexGuard};
 
 use xpui::Button;
 use xpui::host::Input;
-use xpui_simulator::{Board, Keypad, Keys, Panel, Press, Raw, Session};
+use xpui_boards_pimoroni as pimoroni;
+use xpui_boards_xteink as xteink;
+use xpui_simulator::{Keypad, Keys, Panel, Press, Raw, Session};
 
 /// `Session::new` installs the process-wide host, so one test at a time.
 static SERIAL: Mutex<()> = Mutex::new(());
@@ -72,11 +74,11 @@ impl Keys for Timer {
 #[test]
 fn a_press_arrives_untouched_when_nothing_reads_it() {
     let _guard = serial();
-    let session = Session::new(Panel::of(Board::X4));
+    let session = Session::new(Panel::of(xteink::X4));
     let mut keys = keypad(Raw);
 
     session.backend().begin_frame(0);
-    keys.down(session.backend(), Button::Confirm, 0, Board::X4);
+    keys.down(session.backend(), Button::Confirm, 0, xteink::X4);
 
     assert!(
         Input::was_pressed(Button::Confirm),
@@ -87,11 +89,11 @@ fn a_press_arrives_untouched_when_nothing_reads_it() {
 #[test]
 fn a_translated_press_is_released_as_what_it_became() {
     let _guard = serial();
-    let session = Session::new(Panel::of(Board::X4));
+    let session = Session::new(Panel::of(xteink::X4));
     let mut keys = keypad(Renames);
 
     session.backend().begin_frame(0);
-    keys.down(session.backend(), Button::Confirm, 0, Board::X4);
+    keys.down(session.backend(), Button::Confirm, 0, xteink::X4);
 
     assert!(
         Input::is_pressed(Button::Back),
@@ -118,11 +120,11 @@ fn a_translated_press_is_released_as_what_it_became() {
 #[test]
 fn a_swallowed_press_reaches_nothing() {
     let _guard = serial();
-    let session = Session::new(Panel::of(Board::X4));
+    let session = Session::new(Panel::of(xteink::X4));
     let mut keys = keypad(Eats);
 
     session.backend().begin_frame(0);
-    keys.down(session.backend(), Button::Confirm, 0, Board::X4);
+    keys.down(session.backend(), Button::Confirm, 0, xteink::X4);
 
     assert!(
         !Input::was_pressed(Button::Confirm),
@@ -147,7 +149,7 @@ fn a_swallowed_press_reaches_nothing() {
 #[test]
 fn a_press_that_comes_due_arrives_whole() {
     let _guard = serial();
-    let session = Session::new(Panel::of(Board::BADGER_2040));
+    let session = Session::new(Panel::of(pimoroni::BADGER_2040));
     let mut keys = keypad(Timer {
         at: 350,
         fired: false,
@@ -155,7 +157,7 @@ fn a_press_that_comes_due_arrives_whole() {
 
     // Swallowed on the way down, and nothing is due yet.
     session.backend().begin_frame(0);
-    keys.down(session.backend(), Button::Confirm, 0, Board::BADGER_2040);
+    keys.down(session.backend(), Button::Confirm, 0, pimoroni::BADGER_2040);
     keys.due(session.backend(), 0);
     assert!(
         !Input::was_pressed(Button::Confirm),
@@ -185,11 +187,11 @@ fn a_press_that_comes_due_arrives_whole() {
 #[test]
 fn switching_board_lets_go_of_everything_it_was_holding() {
     let _guard = serial();
-    let session = Session::new(Panel::of(Board::X4));
+    let session = Session::new(Panel::of(xteink::X4));
     let mut keys = keypad(Raw);
 
     session.backend().begin_frame(0);
-    keys.down(session.backend(), Button::PageForward, 0, Board::X4);
+    keys.down(session.backend(), Button::PageForward, 0, xteink::X4);
     assert!(Input::is_pressed(Button::PageForward));
 
     session.backend().begin_frame(1);
@@ -222,7 +224,7 @@ impl Keys for RenamesInTurn {
 #[test]
 fn a_second_press_with_no_release_replaces_the_first() {
     let _guard = serial();
-    let session = Session::new(Panel::of(Board::X4));
+    let session = Session::new(Panel::of(xteink::X4));
     let mut keys = keypad(RenamesInTurn { seen: 0 });
 
     // The same key twice with nothing between: an auto-repeat that got
@@ -230,8 +232,8 @@ fn a_second_press_with_no_release_replaces_the_first() {
     // Each press translated to something different, so what the single
     // release lets go of says how many rows the table was holding.
     session.backend().begin_frame(0);
-    keys.down(session.backend(), Button::Confirm, 0, Board::X4);
-    keys.down(session.backend(), Button::Confirm, 1, Board::X4);
+    keys.down(session.backend(), Button::Confirm, 0, xteink::X4);
+    keys.down(session.backend(), Button::Confirm, 1, xteink::X4);
 
     session.backend().begin_frame(2);
     keys.up(session.backend(), Button::Confirm);
@@ -251,11 +253,11 @@ fn a_second_press_with_no_release_replaces_the_first() {
 #[test]
 fn a_board_switch_tells_the_keys_to_forget() {
     let _guard = serial();
-    let session = Session::new(Panel::of(Board::BADGER_2040));
+    let session = Session::new(Panel::of(pimoroni::BADGER_2040));
     let mut keys = keypad(Forgetful::default());
 
     session.backend().begin_frame(0);
-    keys.down(session.backend(), Button::Confirm, 0, Board::BADGER_2040);
+    keys.down(session.backend(), Button::Confirm, 0, pimoroni::BADGER_2040);
     keys.release_all(session.backend());
 
     session.backend().begin_frame(1);

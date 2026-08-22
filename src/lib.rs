@@ -21,8 +21,9 @@
 //! fn main() {
 //!     // Whichever device you are developing for. This crate has no default
 //!     // one and no list of its own: it opens whatever board it is handed.
-//!     // `xpui-boards` carries seven ready-made presets, and `Board::custom`
-//!     // describes anything else.
+//!     // `xpui-boards-pimoroni`, `-xteink` and `-seeed` carry ready-made
+//!     // ones — a crate per vendor, so you take the devices you target —
+//!     // and `Board::custom` describes anything else.
 //!     let mine = Board::custom("my reader", 480, 800, false);
 //!     Simulator::new(Panel::of(mine)).run(MainMenu::new());
 //! }
@@ -30,7 +31,7 @@
 //!
 //! # The device around the panel
 //!
-//! A [`Board`] that describes its body — see [`xpui_boards::Bezel`] — opens a
+//! A [`Board`] that describes its body — see [`xpui_boards_core::Bezel`] — opens a
 //! window larger than the panel, with the panel inset into it and the real
 //! buttons drawn where a thumb would find them. Those buttons are clickable
 //! and feed the same input the keyboard does. A board with no bezel opens a
@@ -126,7 +127,7 @@ pub use run::Simulator;
 pub use screenshot::capture as capture_panel;
 pub use session::Session;
 pub use touch::{EdgeGesture, Touch, Touches, Touchscreen};
-pub use xpui_boards::Board;
+pub use xpui_boards_core::Board;
 
 /// The crate's prose, compiled.
 ///

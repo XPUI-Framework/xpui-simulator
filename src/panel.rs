@@ -5,7 +5,7 @@ use embedded_graphics_simulator::{
     BinaryColorTheme, OutputSettings, OutputSettingsBuilder, SimulatorDisplay,
 };
 
-use xpui_boards::Board;
+use xpui_boards_core::Board;
 
 use crate::layout::BezelLayout;
 

@@ -13,8 +13,8 @@ use embedded_graphics::prelude::*;
 use embedded_graphics::primitives::{PrimitiveStyle, Rectangle, RoundedRectangle};
 use embedded_graphics::text::{Alignment, Baseline, Text, TextStyleBuilder};
 use embedded_graphics_simulator::SimulatorDisplay;
-use xpui_boards::KeyAction;
-use xpui_boards::PhysicalButton;
+use xpui_boards_core::KeyAction;
+use xpui_boards_core::PhysicalButton;
 
 use crate::layout::BezelLayout;
 

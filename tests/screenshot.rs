@@ -12,7 +12,9 @@ use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
 use xpui::{App, Divider, Screen, View, vstack};
-use xpui_simulator::{Board, Panel, Session, capture_panel};
+use xpui_boards_pimoroni as pimoroni;
+use xpui_boards_xteink as xteink;
+use xpui_simulator::{Panel, Session, capture_panel};
 
 static SERIAL: Mutex<()> = Mutex::new(());
 
@@ -71,7 +73,7 @@ fn a_press_writes_this_panel() {
     let _guard = serial();
     let dir = scratch("screenshot-writes");
 
-    let session = Session::new(Panel::of(Board::BADGER_2040));
+    let session = Session::new(Panel::of(pimoroni::BADGER_2040));
     App::new(Rule).render();
     let path = capture_panel(session.backend(), session.board().slug, &dir);
 
@@ -81,14 +83,14 @@ fn a_press_writes_this_panel() {
     );
     let name = path.file_name().unwrap().to_string_lossy();
     assert!(
-        name.starts_with(Board::BADGER_2040.slug),
+        name.starts_with(pimoroni::BADGER_2040.slug),
         "a file called {name} does not say which board it is of"
     );
 
     let (width, height, ink) = read_bmp(&path);
     assert_eq!(
         (width, height),
-        (Board::BADGER_2040.width, Board::BADGER_2040.height),
+        (pimoroni::BADGER_2040.width, pimoroni::BADGER_2040.height),
         "the file is the panel — not the window, and not the device around it"
     );
     assert!(
@@ -104,13 +106,13 @@ fn a_press_writes_this_panel() {
 fn it_never_writes_over_a_shot_that_is_already_there() {
     let _guard = serial();
     let dir = scratch("screenshot-numbering");
-    let slug = Board::X4.slug;
+    let slug = xteink::X4.slug;
 
     // As if an earlier run had left one behind.
     let taken = dir.join(format!("{slug}-1.bmp"));
     fs::write(&taken, b"not a screenshot").expect("can seed the directory");
 
-    let session = Session::new(Panel::of(Board::X4));
+    let session = Session::new(Panel::of(xteink::X4));
     App::new(Rule).render();
     let first = capture_panel(session.backend(), session.board().slug, &dir);
     let second = capture_panel(session.backend(), session.board().slug, &dir);

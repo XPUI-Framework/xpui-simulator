@@ -16,6 +16,8 @@ fn eg(at: xpui::Point) -> Point {
 use embedded_graphics_simulator::SimulatorDisplay;
 use xpui_simulator::{BezelLayout, Board, Panel, paint_body};
 
+mod devices;
+
 /// Renders a board's body, and reports how many pixels differ from the
 /// background it started as.
 fn painted(board: Board) -> (SimulatorDisplay<Rgb888>, BezelLayout) {
@@ -49,7 +51,7 @@ fn distinct_colours(
 /// Every key has to be visible, or you cannot press what you cannot see.
 #[test]
 fn every_key_is_drawn() {
-    for board in Board::ALL {
+    for board in devices::ALL {
         let Some(bezel) = board.bezel else { continue };
         let (display, layout) = painted(board);
 
@@ -75,7 +77,7 @@ fn every_key_is_drawn() {
 /// or the screen has no edge and the device reads as a slab.
 #[test]
 fn the_panel_sits_in_a_visible_well() {
-    for board in Board::ALL {
+    for board in devices::ALL {
         let Some(_) = board.bezel else { continue };
         let (display, layout) = painted(board);
 
@@ -94,7 +96,7 @@ fn the_panel_sits_in_a_visible_well() {
 /// A held key has to look held, or pressing one gives no feedback at all.
 #[test]
 fn a_held_key_looks_different() {
-    for board in Board::ALL {
+    for board in devices::ALL {
         let Some(bezel) = board.bezel else { continue };
         let button = bezel.buttons[0];
         let panel = Panel::of(board);

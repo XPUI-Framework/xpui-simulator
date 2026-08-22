@@ -44,15 +44,21 @@ Opening a screen of your own instead:
 use xpui_simulator::{Board, Panel, Simulator};
 
 fn main() {
-    Simulator::new(Panel::of(Board::X4)).title("my reader").run(MyScreen::new());
+    // Your panel. The vendor crates carry ready-made ones; this crate knows
+    // no device and opens whatever it is handed.
+    let mine = Board::custom("my reader", 480, 800, false);
+    Simulator::new(Panel::of(mine)).title("my reader").run(MyScreen::new());
 }
 ```
 
 There is no default panel: this crate knows no devices, so a caller names one.
+`Board::custom` describes any panel; `xpui-boards-pimoroni`, `xpui-boards-xteink`
+and `xpui-boards-seeed` carry ready-made ones — a project depends on the vendor
+it targets and not the other two.
+
 `Panel::of(board)` gives that device its own size and a scale that keeps the
-window within reach of a laptop display. The X4 is 480 × 800 held portrait, and
-big enough to show at 1:1; a 296 × 128 strip at 1:1 is a postage stamp, so it
-is tripled.
+window within reach of a laptop display. A 480 × 800 reader is big enough to
+show at 1:1; a 296 × 128 strip at 1:1 is a postage stamp, so it is tripled.
 
 The board keys walk one board by default: the one the panel was opened on.
 `Simulator::boards(&[..])` is how an application offers more, in its own order.
@@ -363,7 +369,7 @@ render what came back.
 is the shortest worked example of the assertion above.
 [`examples/gallery/tests/screenshots.rs`](../../../../examples/gallery/tests/screenshots.rs)
 is the fuller one: it pairs goldens with `ink_in` checks like the one beside
-the assertion above, and runs the pair across `Board::ALL` — nine screens on
+the assertion above, and runs the pair across the gallery's seven — nine screens on
 seven panels, each against a PNG committed as `<screen>_<board slug>.png`,
 pixel for pixel. That one calls `check_screenshot` rather than
 `assert_screenshot`, the same comparison handing its report back instead of

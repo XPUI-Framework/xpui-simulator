@@ -26,7 +26,7 @@
 mod gesture;
 
 use xpui::Point;
-use xpui_boards::Board;
+use xpui_boards_core::Board;
 
 pub use gesture::{EdgeGesture, Touch, Touches};
 
