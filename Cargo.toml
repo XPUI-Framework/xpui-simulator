@@ -17,7 +17,6 @@ crate-type = ["rlib"]
 [dependencies]
 xpui.workspace = true
 xpui-boards.workspace = true
-xpui-chrome.workspace = true
 # `framebuffer` for the screenshot key: it is the BMP writer the screenshot
 # tests already use, and a second one here would be a second thing to get
 # wrong. Host-only, which this crate is anyway — it links SDL.
