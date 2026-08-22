@@ -319,9 +319,8 @@ passed. Building is not running.
 
 ## No window at all
 
-A window is the wrong tool for asserting on a screen. The `embedded_graphics`
-backend's `framebuffer` feature renders to memory instead, with no SDL and no
-simulator involved:
+A window is the wrong tool for asserting on a screen. `xpui-screenshot`
+renders to memory instead, with no SDL and no simulator involved:
 
 ```rust,no_run
 # use embedded_graphics::pixelcolor::BinaryColor;

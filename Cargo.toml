@@ -22,8 +22,10 @@ xpui-boards.workspace = true
 # a PNG codec in behind it.
 xpui-embedded-graphics.workspace = true
 # `Framebuffer::new` and `write_bmp_in`, for the screenshot key. Without
-# `golden`, because `write_bmp_in` hand-writes a BITMAPINFOHEADER and needs no
-# image codec — carrying one here was the cost that split this crate out.
+# `golden`: `write_bmp_in` hand-writes a BITMAPINFOHEADER and needs no image
+# codec. This crate compiles one anyway, because `embedded-graphics-simulator`
+# pulls `image` which pulls `png` — so the saving is not here, it is for
+# everyone else.
 xpui-screenshot.workspace = true
 embedded-graphics = "0.8"
 embedded-graphics-simulator = "0.8"
