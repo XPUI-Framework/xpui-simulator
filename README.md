@@ -59,6 +59,17 @@ brew install sdl2           # macOS
 apt install libsdl2-dev     # Debian/Ubuntu
 ```
 
+## Checking it
+
+```bash
+./build-and-test.sh
+```
+
+The checks are in [`xtask/`](xtask/) — this repository's own list, in Rust,
+holding nothing it does not run. There is no bare-metal lint here and there is
+no C++ stage: this crate opens a window, and runs on a desktop and nowhere
+else. `./build-and-test.sh fix` formats in place first.
+
 ## Why the window redraws when nothing changed
 
 E-ink takes a second or more to refresh, so `App` only repaints when something

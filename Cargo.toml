@@ -47,6 +47,10 @@ xpui-boards-xteink = { git = "https://github.com/XPUI-Framework/xpui-boards", br
 xpui = { git = "https://github.com/XPUI-Framework/xpui-framework", branch = "main", features = ["testing"] }
 
 [workspace]
+# `xtask` is the gate. A member rather than a separate workspace so one
+# `cargo test` reaches its tests, and so the size ratchet counts its source
+# like any other.
+members = ["xtask"]
 
 # What a `cargo build --release` of this repository alone produces.
 #
