@@ -3,7 +3,7 @@
 > ⚠️ **Under heavy development.** Not production-ready. The API can break
 > without notice. Use at your own risk.
 
-Runs an [`xpui`](https://github.com/XPUI-Framework/xpui-framework/tree/main/crates/xpui) app in a desktop window, so screens can be
+Runs an [`xpui`](https://github.com/XPUI-Framework/xpui-framework) app in a desktop window, so screens can be
 developed without hardware.
 
 ```rust,no_run
