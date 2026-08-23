@@ -295,6 +295,12 @@ buttons. It is firmware UI, which the real device draws on the e-ink too.
 **E** hides the body, leaving the bare panel letterboxed in the middle of the
 window — which is what a board that has never described one shows.
 
+**Nothing a screen draws can leave the panel rectangle.** The backend wraps
+every draw in `DrawTargetExt::clipped`, so a widget that measured itself wrong
+is cut off at the panel's edge rather than painted over the bezel — which is
+what a device would do, and what makes the body around the panel safe to draw
+at all.
+
 ## `--frames N`
 
 ```bash
