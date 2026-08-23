@@ -33,6 +33,7 @@ gates() {
   readmes_warn
   prose_is_compiled
   doc_paths
+  commands_resolve
   cpp_snippets_compile
   lint
   test_suite

@@ -21,7 +21,18 @@ Nothing else is needed. The simulator is a plain `cargo run`.
 
 ## Running the gallery
 
+**The gallery is a repository of its own**, because it is the application and
+this is the library it draws through. Clone it beside this one:
+
 ```bash
+cd .. && git clone https://github.com/XPUI-Framework/xpui-gallery
+```
+
+Every block below opens by entering it, so each one stands on its own — this
+page is read by jumping to a section, not from the top.
+
+```bash
+cd ../xpui-gallery
 cargo run -p xpui-gallery
 ```
 
@@ -62,7 +73,7 @@ show at 1:1; a 296 × 128 strip at 1:1 is a postage stamp, so it is tripled.
 
 The board keys walk one board by default: the one the panel was opened on.
 `Simulator::boards(&[..])` is how an application offers more, in its own order.
-`examples/gallery/src/main.rs` passes all seven.
+`xpui-gallery`'s `gallery/src/main.rs` passes all seven.
 
 `Panel::of(..).scaled(n)` overrides that. Scale is a window concern: doubling
 every panel pixel changes nothing about what the screen is laid out against.
@@ -78,6 +89,7 @@ it" true rather than aspirational, and it picks a sensible scale so a 296 × 128
 strip is not a postage stamp on a modern display.
 
 ```bash
+cd ../xpui-gallery
 cargo run -p xpui-gallery -- --board x4            # the default
 cargo run -p xpui-gallery -- --board x3
 cargo run -p xpui-gallery -- --board x4pro         # the touch reader
@@ -275,6 +287,7 @@ inset into a shell drawn from the device's published millimetre dimensions,
 with its real buttons where a thumb would find them.
 
 ```bash
+cd ../xpui-gallery
 cargo run -p xpui-gallery -- --board badger2040   # five buttons, all on the front
 cargo run -p xpui-gallery -- --board x3           # Up and Down on the side
 ```
@@ -304,6 +317,7 @@ at all.
 ## `--frames N`
 
 ```bash
+cd ../xpui-gallery
 cargo run -p xpui-gallery -- --frames 60
 ```
 
@@ -315,20 +329,21 @@ none of which happens on its own. A CI run, or any check that the loop even
 *starts*, would hang until something killed it.
 
 `--frames` is the gallery's own flag, parsed by hand in
-[`examples/gallery/src/main.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/src/main.rs) and
+[`xpui-gallery`'s `gallery/src/main.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/src/main.rs) and
 passed to `Simulator::frames`. An application embedding the simulator wires up
 its own way of setting it, or none.
 
 ## Headless
 
 ```bash
+cd xpui-gallery
 SDL_VIDEODRIVER=dummy cargo run -p xpui-gallery -- --frames 30
 ```
 
 `dummy` gives SDL a windowless target, so this works over ssh and on a CI runner
 with no display. Combined with `--frames` it is a complete smoke test of the
 loop, which is exactly what
-[`examples/gallery/tests/simulator.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/tests/simulator.rs)
+[`xpui-gallery`'s `gallery/tests/simulator.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/tests/simulator.rs)
 does — it runs the binary headlessly for 30 frames and again for 1, and fails if
 either panics or overruns a deadline.
 
@@ -373,9 +388,9 @@ backend.with_display(|frame| {
 Input goes in the same way the simulator feeds it — `backend.begin_frame(ms)`,
 `backend.press(Button::Confirm)`, `app.tick()` — so a test can press a button and
 render what came back.
-[`examples/gallery/tests/typeface.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/tests/typeface.rs)
+[`xpui-gallery`'s `gallery/tests/typeface.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/tests/typeface.rs)
 is the shortest worked example of the assertion above.
-[`examples/gallery/tests/screenshots.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/tests/screenshots.rs)
+[`xpui-gallery`'s `gallery/tests/screenshots.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/tests/screenshots.rs)
 is the fuller one: it pairs goldens with `ink_in` checks like the one beside
 the assertion above, and runs the pair across the gallery's seven — nine screens on
 seven panels, each against a PNG committed as `<screen>_<board slug>.png`,
