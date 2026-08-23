@@ -65,3 +65,7 @@ E-ink takes a second or more to refresh, so `App` only repaints when something
 actually changed. The window still has to be pumped every frame or the OS
 thinks the app has hung — so the loop pushes the unchanged framebuffer and
 sleeps, rather than spinning a core.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Copyright (c) 2026 Thiago Holanda.

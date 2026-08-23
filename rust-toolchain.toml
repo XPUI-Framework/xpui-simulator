@@ -1,0 +1,18 @@
+# Pins the Rust toolchain for everyone, including CI.
+#
+# Without a pin, `cargo clippy -- -D warnings` breaks the moment a new stable
+# release adds a lint — on somebody else's unrelated pull request. Bumping this
+# file is then a deliberate change, reviewed like any other.
+#
+# To bump: raise `channel`, run `./build-and-test.sh`, fix whatever the new
+# clippy found, and commit the two together. Every repository in the
+# organisation carries this file with the same channel; they are bumped
+# together or they disagree about what a warning is.
+
+[toolchain]
+channel = "1.97.1"
+components = ["rustfmt", "clippy"]
+
+# No `targets`. Nothing here builds for a device: this repository is host-only,
+# and its gate names no bare-metal triple. Adding one would install a toolchain
+# nothing in this tree compiles for.
