@@ -1,5 +1,8 @@
 # `xpui-simulator`
 
+> ⚠️ **Under heavy development.** Not production-ready. The API can break
+> without notice. Use at your own risk.
+
 Runs an [`xpui`](../../xpui/) app in a desktop window, so screens can be
 developed without hardware.
 
