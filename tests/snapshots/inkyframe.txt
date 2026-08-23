@@ -1,0 +1,9 @@
+board       Inky Frame 5.7" (inkyframe)
+panel       600x448 at scale 1
+window      686x665
+well        (43,43) 600x448
+key         (53,563) 31x31 "A" -> Press(Back)
+key         (190,563) 31x31 "B" -> Press(Confirm)
+key         (328,563) 31x31 "C" -> Press(Left)
+key         (464,563) 31x31 "D" -> Press(Right)
+key         (602,563) 31x31 "E" -> Press(Power)

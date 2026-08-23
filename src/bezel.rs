@@ -108,12 +108,8 @@ fn key(
     button: &PhysicalButton,
     held: bool,
 ) {
-    let centre = layout.to_window(button.centre);
-    let (width, height) = layout.to_window_size(button.size);
-    let face = rect(
-        Point::new(centre.x - width / 2, centre.y - height / 2),
-        (width, height),
-    );
+    let (corner, (width, height)) = layout.key_face(button.centre, button.size);
+    let face = rect(Point::new(corner.x, corner.y), (width, height));
 
     // A key described as square is round on the device — the X4 Pro's Home key
     // is the one of these there is. Drawing it with a corner radius of half its

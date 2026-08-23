@@ -29,6 +29,7 @@ HOST_WORKSPACE=1
 
 gates() {
   file_sizes
+  crates_are_tested
   every_check_runs
   readmes_warn
   prose_is_compiled

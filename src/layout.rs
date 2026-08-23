@@ -97,6 +97,23 @@ impl BezelLayout {
             && at.y < origin.y + self.panel_px.1
     }
 
+    /// Where a key's face lands, in window pixels.
+    ///
+    /// **One function, because two would drift.** The painter draws this rect
+    /// and a test asserts against it; when each did its own arithmetic they
+    /// disagreed by a pixel on four of the X3's keys — convert-then-halve is
+    /// not halve-then-convert — and the committed golden recorded coordinates
+    /// no code produced. The same argument `draw_option_popup` and
+    /// `option_popup_row_rect` are one layout function for.
+    pub const fn key_face(self, centre: (i32, i32), size: (i32, i32)) -> (Point, (i32, i32)) {
+        let middle = self.to_window(centre);
+        let (width, height) = self.to_window_size(size);
+        (
+            Point::new(middle.x - width / 2, middle.y - height / 2),
+            (width, height),
+        )
+    }
+
     /// A point on the device, in window pixels.
     pub const fn to_window(self, at: (i32, i32)) -> Point {
         Point::new(

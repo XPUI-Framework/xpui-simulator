@@ -1,0 +1,9 @@
+board       Tufty 2040 (tufty2040)
+panel       320x240 at scale 2
+window      853x689
+well        (70,78) 640x480
+key         (79,588) 124x71 "a" -> Press(Back)
+key         (364,588) 124x71 "b" -> Press(Confirm)
+key         (648,588) 124x71 "c" -> Unassigned
+key         (746,210) 71x71 "Up" -> Press(Up)
+key         (746,354) 71x71 "Dn" -> Press(Down)

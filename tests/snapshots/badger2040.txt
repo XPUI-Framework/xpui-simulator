@@ -1,0 +1,9 @@
+board       Badger 2040 (badger2040)
+panel       296x128 at scale 3
+window      1136x642
+well        (84,79) 888x384
+key         (115,513) 146x79 "a" -> Press(Back)
+key         (495,513) 146x79 "b" -> Press(Confirm)
+key         (873,513) 146x79 "c" -> Unassigned
+key         (1014,153) 79x79 "Up" -> Press(Up)
+key         (1014,312) 79x79 "Dn" -> Press(Down)

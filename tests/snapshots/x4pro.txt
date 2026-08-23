@@ -1,0 +1,8 @@
+board       Xteink X4 Pro (x4pro)
+panel       480x800 at scale 1
+window      662x1165
+well        (91,91) 480x800
+key         (20,400) 50x182 "Prev" -> Press(PageBack)
+key         (592,312) 50x125 "Sleep" -> Press(Power)
+key         (592,488) 50x182 "Next" -> Press(PageForward)
+key         (274,971) 114x114 "Home" -> Home
