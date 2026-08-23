@@ -69,8 +69,10 @@ every panel pixel changes nothing about what the screen is laid out against.
 
 ## Boards
 
-`Panel::of(board)` takes a [`Board`](../../../boards/src/lib.rs) — a panel size,
-the chrome sized for it, and whether it has a touchscreen. It is the *same*
+`Panel::of(board)` takes a [`Board`](../../../boards/core/src/lib.rs) — a panel
+size, what its keys mean, whether it has a touchscreen, and how much larger
+than the baseline its chrome should be. Not the chrome itself: whoever wires
+the backend derives that from the panel's size and that scale. It is the *same*
 value a firmware reads, which is what makes "develop in a window, then flash
 it" true rather than aspirational, and it picks a sensible scale so a 296 × 128
 strip is not a postage stamp on a modern display.
@@ -268,7 +270,7 @@ screen ship depending on it. Use the keys, or a board that has a touchscreen.
 ## The device around the panel
 
 A board that has described its body — see
-[`Bezel`](../../../boards/src/bezel.rs) — is drawn inside it. The panel is
+[`Bezel`](../../../boards/core/src/bezel.rs) — is drawn inside it. The panel is
 inset into a shell drawn from the device's published millimetre dimensions,
 with its real buttons where a thumb would find them.
 
