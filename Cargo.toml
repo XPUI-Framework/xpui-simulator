@@ -4,44 +4,53 @@ description = "Runs an xpui app in a desktop window, for developing screens with
 readme = "README.md"
 keywords = ["ui", "embedded", "eink", "simulator", "xpui"]
 categories = ["development-tools", "gui"]
-version.workspace = true
-edition.workspace = true
-license.workspace = true
-authors.workspace = true
-repository.workspace = true
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+authors = ["Thiago Holanda <unnamedd@gmail.com>"]
+repository = "https://github.com/XPUI-Framework/xpui-simulator"
 
 [lib]
 name = "xpui_simulator"
 crate-type = ["rlib"]
 
 [dependencies]
-xpui.workspace = true
+xpui = { git = "https://github.com/XPUI-Framework/xpui-framework", branch = "main" }
 # The vocabulary a device is described in — `Board`, `Bezel`, `KeyAction`. Not
 # a vendor's data: this crate names no device, and the cycle it walks is the
 # one its caller hands it.
-xpui-boards-core.workspace = true
+xpui-boards-core = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
 # The chrome it wires into a backend. The simulator stands in for a firmware,
 # and a firmware is what chooses measurements and words for its panel.
-xpui-chrome.workspace = true
+xpui-chrome = { git = "https://github.com/XPUI-Framework/xpui-chrome", branch = "main" }
 # The backend it installs. No screenshot feature any more: the BMP writer it
 # uses for the screenshot key lives in `xpui-screenshot`, which does not drag
 # a PNG codec in behind it.
-xpui-embedded-graphics.workspace = true
+xpui-embedded-graphics = { git = "https://github.com/XPUI-Framework/xpui-backends", branch = "main" }
 # `Framebuffer::new` and `write_bmp_in`, for the screenshot key. Without
 # `golden`: `write_bmp_in` hand-writes a BITMAPINFOHEADER and needs no image
 # codec. This crate compiles one anyway, because `embedded-graphics-simulator`
 # pulls `image` which pulls `png` — so the saving is not here, it is for
 # everyone else.
-xpui-screenshot.workspace = true
+xpui-screenshot = { git = "https://github.com/XPUI-Framework/xpui-backends", branch = "main" }
 embedded-graphics = "0.8"
 embedded-graphics-simulator = "0.8"
 
 [dev-dependencies]
 # Real devices, for tests only. A test needs bodies with keys on them to be
 # worth anything, and a dev-dependency does not reach a consumer.
-xpui-boards-pimoroni.workspace = true
-xpui-boards-seeed.workspace = true
-xpui-boards-xteink.workspace = true
+xpui-boards-pimoroni = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
+xpui-boards-seeed = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
+xpui-boards-xteink = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
 # The guide shows how to screenshot a screen without a window, and that block
 # is compiled rather than taken on trust.
-xpui = { workspace = true, features = ["testing"] }
+xpui = { git = "https://github.com/XPUI-Framework/xpui-framework", branch = "main", features = ["testing"] }
+
+[workspace]
+
+# Shared across every repository so host, RISC-V and Xtensa builds agree.
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
