@@ -1,7 +1,7 @@
 # Running the simulator
 
 A window, an event pump and a keyboard map around the
-[`embedded_graphics`](../../embedded_graphics/README.md) backend. There is no
+[`embedded_graphics`](https://github.com/XPUI-Framework/xpui-backends/blob/main/embedded_graphics/README.md) backend. There is no
 simulator-specific drawing path — the pixels in the window are the pixels a
 panel would get, from the same backend, the same components and the same font
 metrics. [The README](../README.md) covers what the crate is; this covers
@@ -26,7 +26,7 @@ cargo run -p xpui-gallery
 ```
 
 That is the fastest way to see a framework change: the
-[gallery](../../../../examples/gallery/) has a screen each for controls, lists,
+[gallery](https://github.com/XPUI-Framework/xpui-gallery/tree/main/gallery) has a screen each for controls, lists,
 dialogs, scrolling, text, typefaces and one that puts everything on a single
 page, so a widget that broke shows up in one of them.
 
@@ -69,7 +69,7 @@ every panel pixel changes nothing about what the screen is laid out against.
 
 ## Boards
 
-`Panel::of(board)` takes a [`Board`](../../../boards/core/src/lib.rs) — a panel
+`Panel::of(board)` takes a [`Board`](https://github.com/XPUI-Framework/xpui-boards/blob/main/core/src/lib.rs) — a panel
 size, what its keys mean, whether it has a touchscreen, and how much larger
 than the baseline its chrome should be. Not the chrome itself: whoever wires
 the backend derives that from the panel's size and that scale. It is the *same*
@@ -270,7 +270,7 @@ screen ship depending on it. Use the keys, or a board that has a touchscreen.
 ## The device around the panel
 
 A board that has described its body — see
-[`Bezel`](../../../boards/core/src/bezel.rs) — is drawn inside it. The panel is
+[`Bezel`](https://github.com/XPUI-Framework/xpui-boards/blob/main/core/src/bezel.rs) — is drawn inside it. The panel is
 inset into a shell drawn from the device's published millimetre dimensions,
 with its real buttons where a thumb would find them.
 
@@ -315,7 +315,7 @@ none of which happens on its own. A CI run, or any check that the loop even
 *starts*, would hang until something killed it.
 
 `--frames` is the gallery's own flag, parsed by hand in
-[`examples/gallery/src/main.rs`](../../../../examples/gallery/src/main.rs) and
+[`examples/gallery/src/main.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/src/main.rs) and
 passed to `Simulator::frames`. An application embedding the simulator wires up
 its own way of setting it, or none.
 
@@ -328,7 +328,7 @@ SDL_VIDEODRIVER=dummy cargo run -p xpui-gallery -- --frames 30
 `dummy` gives SDL a windowless target, so this works over ssh and on a CI runner
 with no display. Combined with `--frames` it is a complete smoke test of the
 loop, which is exactly what
-[`examples/gallery/tests/simulator.rs`](../../../../examples/gallery/tests/simulator.rs)
+[`examples/gallery/tests/simulator.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/tests/simulator.rs)
 does — it runs the binary headlessly for 30 frames and again for 1, and fails if
 either panics or overruns a deadline.
 
@@ -373,9 +373,9 @@ backend.with_display(|frame| {
 Input goes in the same way the simulator feeds it — `backend.begin_frame(ms)`,
 `backend.press(Button::Confirm)`, `app.tick()` — so a test can press a button and
 render what came back.
-[`examples/gallery/tests/typeface.rs`](../../../../examples/gallery/tests/typeface.rs)
+[`examples/gallery/tests/typeface.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/tests/typeface.rs)
 is the shortest worked example of the assertion above.
-[`examples/gallery/tests/screenshots.rs`](../../../../examples/gallery/tests/screenshots.rs)
+[`examples/gallery/tests/screenshots.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/tests/screenshots.rs)
 is the fuller one: it pairs goldens with `ink_in` checks like the one beside
 the assertion above, and runs the pair across the gallery's seven — nine screens on
 seven panels, each against a PNG committed as `<screen>_<board slug>.png`,

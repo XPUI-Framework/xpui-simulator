@@ -3,7 +3,7 @@
 > ⚠️ **Under heavy development.** Not production-ready. The API can break
 > without notice. Use at your own risk.
 
-Runs an [`xpui`](../../xpui/) app in a desktop window, so screens can be
+Runs an [`xpui`](https://github.com/XPUI-Framework/xpui-framework/tree/main/crates/xpui) app in a desktop window, so screens can be
 developed without hardware.
 
 ```rust,no_run
@@ -29,7 +29,7 @@ fn main() {
 ```
 
 Not a separate rendering backend: it is
-[`xpui-embedded-graphics`](../embedded_graphics/) over
+[`xpui-embedded-graphics`](https://github.com/XPUI-Framework/xpui-backends/tree/main/embedded_graphics) over
 `embedded-graphics-simulator`'s display, plus a window, an event pump and a
 keyboard mapping. **The pixels are the ones a device would get** — same
 backend, same components, same measurements.
