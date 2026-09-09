@@ -18,12 +18,10 @@ pub struct BezelLayout {
     bezel: Bezel,
     /// The panel's size in window pixels: its own pixels times the scale.
     panel_px: (i32, i32),
-    /// Where the body's top-left corner sits in the window.
-    ///
-    /// Zero when the window is exactly the body. It is not, once the window is
-    /// fixed and every board is letterboxed into the middle of it — and the
-    /// offset has to live here rather than only in the painter, because the
-    /// same numbers route every mouse position back onto the device.
+    /// Where the body's top-left corner sits in the window: zero when the
+    /// window is exactly the body, and otherwise the letterbox. Here rather
+    /// than only in the painter, because the same numbers route every mouse
+    /// position back onto the device.
     origin: Point,
 }
 
@@ -32,10 +30,8 @@ impl BezelLayout {
     /// at `scale` window pixels each.
     ///
     /// `const` so [`Panel`](crate::Panel) can ask how big the window would be
-    /// at a scale before committing to one. Without it the scale would have to
-    /// be picked from the panel alone, which is how the Tufty 2040 — a small
-    /// panel in a comparatively large body — first opened a window a third
-    /// past what fits on a modest display.
+    /// at a scale before committing to one: a small panel in a large body
+    /// opens a window larger than the panel alone predicts.
     pub const fn new(bezel: Bezel, width: i32, height: i32, scale: u32) -> BezelLayout {
         BezelLayout {
             bezel,
@@ -99,12 +95,9 @@ impl BezelLayout {
 
     /// Where a key's face lands, in window pixels.
     ///
-    /// **One function, because two would drift.** The painter draws this rect
-    /// and a test asserts against it; when each did its own arithmetic they
-    /// disagreed by a pixel on four of the X3's keys — convert-then-halve is
-    /// not halve-then-convert — and the committed golden recorded coordinates
-    /// no code produced. The same argument `draw_option_popup` and
-    /// `option_popup_row_rect` are one layout function for.
+    /// **One function, because two would drift**: the painter draws this rect
+    /// and a test asserts against it, and convert-then-halve is not
+    /// halve-then-convert.
     pub const fn key_face(self, centre: (i32, i32), size: (i32, i32)) -> (Point, (i32, i32)) {
         let middle = self.to_window(centre);
         let (width, height) = self.to_window_size(size);

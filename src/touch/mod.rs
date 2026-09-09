@@ -2,26 +2,17 @@
 //!
 //! Classifying touch is the *simulator's* job and never the framework's:
 //! `xpui` is handed taps, drags, swipes and gestures, and where those came
-//! from is the host's business. A desktop has a mouse, so this is where a
-//! mouse becomes a finger.
+//! from is the host's business. The model is CrossPoint's, ported rule for
+//! rule and constant for constant, because a simulator that classifies
+//! differently agrees with the device right up to where it matters — the
+//! 45-pixel finger roll one slop calls nothing and the device calls a tap.
 //!
-//! The model is CrossPoint's, ported rule for rule and constant for constant
-//! from the firmware rather than invented here. A simulator that classifies
-//! differently from the device agrees with it right up to the point where it
-//! matters — the 45-pixel finger roll that a window calls a tap and a reader
-//! calls nothing at all.
-//!
-//! Nothing here opens a window or touches SDL. A [`Touchscreen`] is driven by
-//! `(position, timestamp)` events, so every rule below is a unit test rather
-//! than something to be checked by hand with a mouse and a stopwatch.
-//!
-//! Positions are *panel* pixels, which is the space a screen is laid out in
-//! and the space the firmware measures in. A window's own pixels are a scaled
-//! view of them and would put every threshold somewhere else at every zoom.
-//!
-//! This file is the contact: a finger's life from landing to lifting, and the
-//! latches that decide what it was. [`gesture`] is what a finished travel
-//! means.
+//! Positions are *panel* pixels, the space a screen is laid out in and the
+//! firmware measures in; a window's own pixels would put every threshold
+//! somewhere else at every zoom. Nothing here touches SDL: a [`Touchscreen`]
+//! is driven by `(position, timestamp)` events, so every rule is a unit test.
+//! This file is the contact, from landing to lifting; [`gesture`] is what a
+//! finished travel means.
 
 mod gesture;
 
@@ -34,7 +25,7 @@ use gesture::{direction, edge_gesture, swiped};
 
 // -- the firmware's numbers -----------------------------------------------
 //
-// All five are CrossPoint's, verbatim from the SDK's `InputManager.h:316-328`.
+// All five are CrossPoint's, verbatim from the SDK's `InputManager.h`.
 
 /// Motion past this cancels the *stationary* classifications — the hold and
 /// the long press. `TOUCH_TAP_SLOP_PX`.
@@ -47,16 +38,12 @@ const SWIPE_MIN_PX: i32 = 60;
 /// release. `TOUCH_TAP_RELEASE_SLOP_PX`, which the firmware defines as
 /// `TOUCH_SWIPE_MIN_PX - 1` — deliberately not as `TOUCH_TAP_SLOP_PX`.
 ///
-/// **The two slops differ on purpose, and it is the detail the whole model
-/// hangs from.** `InputManager.cpp:561-566`: "Hold/long-press detection uses
-/// the tighter 28 px stationary slop, but a released tap remains valid until
-/// motion reaches the 60 px swipe threshold. Using the stationary threshold
-/// here created a 29..59 px dead band where a normal finger roll was neither a
-/// tap nor a swipe."
-///
-/// So a tap stays valid to 59 px and a swipe begins at 60. The two meet
-/// exactly, with nothing in between, and `tests/touch.rs` fails if a gap is
-/// ever reopened.
+/// **The two slops differ on purpose.** Hold and long press use the tighter
+/// 28 px stationary slop, but a released tap stays valid until motion reaches
+/// the 60 px swipe threshold; the stationary slop here would open a 29..59 px
+/// dead band where a normal finger roll is neither a tap nor a swipe. So a tap
+/// stays valid to 59 px and a swipe begins at 60, and `tests/touch.rs` fails
+/// if a gap is ever reopened.
 const TAP_RELEASE_SLOP_PX: i32 = SWIPE_MIN_PX - 1;
 
 /// A swipe is a flick: it must cover the distance within this.
@@ -71,9 +58,10 @@ const LONG_PRESS_MS: u32 = 500;
 /// One finger on the glass, from the moment it lands to the moment it lifts.
 #[derive(Copy, Clone, Debug)]
 struct Contact {
-    /// Where it landed, and when. A tap, a long press and every edge band are
-    /// judged from here.
+    /// Where it landed. A tap, a long press and every edge band are judged
+    /// from here.
     down: Point,
+    /// When it landed.
     down_ms: u32,
     /// The most recent sample. Only a drag and a swipe's end point use it.
     latest: Point,

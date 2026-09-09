@@ -1,24 +1,13 @@
 //! What a raw press becomes before the framework sees it.
 //!
-//! Hardware sends presses. What two of them close together *mean* is the
-//! firmware's decision, and a simulator that decides for it is standing in for
-//! something the hardware does not do. So the presses arrive raw, and a caller
-//! that wants to read something into them says so here.
-//!
-//! Two directions, deliberately not one:
-//!
-//! - **A translation** ([`Keys::translate`]) — a key went down and this is what
-//!   it means. The release of that same key follows its translation, which is
-//!   the part a caller should not have to remember: a press translated to
-//!   `Back` is released as `Back`, never as the key that was physically let go.
-//! - **An injection** ([`Keys::due`]) — a press with no key behind it, produced
-//!   by a timer. Delivered as a complete press *and* release in one frame,
-//!   because there is no finger to lift later and a button left held would
-//!   auto-repeat forever.
-//!
-//! A caller returning a button from the first has renamed a press. One
-//! returning a button from the second has invented one. Those are different
-//! things and they read differently at the call site.
+//! Hardware sends presses; what two of them close together *mean* is the
+//! firmware's decision, so the presses arrive raw and a caller that wants to
+//! read something into them says so here. Two directions, deliberately not
+//! one. A **translation** ([`Keys::translate`]) renames a key that went down,
+//! and its release follows: a press translated to `Back` is released as
+//! `Back`, never as the key let go. An **injection** ([`Keys::due`]) is a
+//! press with no key behind it, produced by a timer, delivered as press and
+//! release in one frame because there is no finger to lift later.
 
 use xpui::Button;
 use xpui_boards_core::Board;
@@ -85,10 +74,8 @@ pub trait Keys {
     fn reset(&mut self) {}
 }
 
-/// Presses reach the framework as they arrive.
-///
-/// What every board did before anything could translate, and what a board with
-/// a key for everything wants.
+/// Presses reach the framework as they arrive: what a board with a key for
+/// everything wants.
 pub struct Raw;
 
 impl Keys for Raw {}

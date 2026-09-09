@@ -38,7 +38,7 @@ impl Panel {
     /// The board is the shared description a firmware reads too, so a screen
     /// developed in this window and the same screen flashed to the hardware
     /// are laid out against identical numbers. Small panels are scaled up:
-    /// a Badger 2040 at 1:1 is a 296x128 window, which is a postage stamp on a
+    /// a Badger 2040 at 1:1 is a 296x128 panel, which is a postage stamp on a
     /// modern display.
     pub const fn of(board: Board) -> Panel {
         Panel {
@@ -51,18 +51,12 @@ impl Panel {
 
     /// The largest whole scale whose window still fits a modest display.
     ///
-    /// The *window*, which is the body when the board has described one and the
-    /// panel when it has not. Both dimensions matter: keying off height alone
-    /// would blow an 800x480 panel up to 1600 pixels wide, and keying off the
-    /// panel alone opened a Tufty 2040 — a small panel in a comparatively large
-    /// body — a third past the budget on both axes.
-    ///
-    /// The budget is deliberately conservative: a window that does not fit
-    /// cannot be moved back on screen on every desktop.
-    ///
-    /// Public because the window a session opens is the largest of these
-    /// across every board it can switch to, and computing that twice is how
-    /// the two would drift.
+    /// The *window* — the body when the board has one, the panel when not —
+    /// on both axes: height alone would blow an 800x300 panel up to 2400
+    /// pixels wide. The budget is conservative because a window that does not
+    /// fit cannot be moved back on screen on every desktop. Public because a
+    /// session's window is the largest of these across every board it can
+    /// switch to.
     pub const fn scale_for(board: Board) -> u32 {
         const MAX_WIDTH: i32 = 1200;
         const MAX_HEIGHT: i32 = 900;
@@ -108,19 +102,16 @@ impl Panel {
     }
 }
 
-/// How the window presents one panel pixel.
-///
-/// Out of line so a test can read it back. Inline in the frame loop it was
-/// unreachable, and the one line that matters here was wrong for as long as
-/// nobody could assert on it.
+/// How the window presents one panel pixel. Out of line so a test can read
+/// it back.
 pub fn window_settings(scale: u32) -> OutputSettings {
     OutputSettingsBuilder::new()
         .scale(scale)
         // Explicit, and load-bearing. `theme()` does
         // `pixel_spacing.get_or_insert(1)` as a side effect, which puts a gap
         // between every panel pixel: the window comes out roughly twice the
-        // size it should be, and mouse coordinates arrive halved, because the
-        // pitch used to unmap them is `scale + spacing`.
+        // size it should be, and mouse coordinates arrive halved, because they
+        // unmap through a pitch of `scale + spacing`.
         .pixel_spacing(0)
         // Ink on paper rather than pixels on black: these are e-ink panels,
         // and a white-on-black preview reads as a bug. The default theme is an

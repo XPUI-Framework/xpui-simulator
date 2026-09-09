@@ -1,11 +1,9 @@
 //! The device around the panel, drawn from primitives.
 //!
-//! No assets. The same reason the chrome backend draws its icons from lines
-//! and rectangles applies here for a different one: manufacturer photography
-//! is not licensed for reuse, and nothing public covers the rest of these
-//! devices. A body from the published dimensions is the shipped path, and
-//! `Bezel::artwork` is the slot where a licensed image can replace it later
-//! without the layout being redesigned around it.
+//! No assets: manufacturer photography is not licensed for reuse, so a body
+//! from the published dimensions is the shipped path, and `Bezel::artwork` is
+//! the slot where a licensed image can replace it without the layout being
+//! redesigned around it.
 
 use embedded_graphics::mono_font::{MonoFont, MonoTextStyle, ascii};
 use embedded_graphics::pixelcolor::Rgb888;
@@ -25,21 +23,23 @@ const SHELL: Rgb888 = Rgb888::new(0x3A, 0x3E, 0x44);
 /// The well the panel is set into, darker than the shell it is cut out of so
 /// the panel reads as recessed rather than pasted on.
 const WELL: Rgb888 = Rgb888::new(0x1E, 0x21, 0x25);
-/// A key at rest, and the same key under a finger.
+/// A key at rest.
 const KEY: Rgb888 = Rgb888::new(0x6B, 0x71, 0x7A);
+/// The same key under a finger.
 const KEY_HELD: Rgb888 = Rgb888::new(0xC8, 0xCE, 0xD6);
-/// A label printed on a key, and one printed on the shell beside it.
+/// A label printed on a key.
 const LEGEND_ON_KEY: Rgb888 = Rgb888::new(0x11, 0x13, 0x16);
+/// A label printed on the shell beside a key.
 const LEGEND_ON_SHELL: Rgb888 = Rgb888::new(0xA8, 0xAE, 0xB6);
 
 /// Legend faces, largest first.
 ///
 /// `embedded-graphics` ships fixed sizes rather than a scalable face, so the
-/// legend picks the biggest one that still fits inside the key. A Badger key at
-/// 3x is 119 pixels across, and 6x10 on it reads as a speck.
+/// legend picks the biggest one that still fits inside the key. A Badger
+/// footer key at 3x is 146 pixels across, and 6x10 on it reads as a speck.
 const FACES: [&MonoFont<'static>; 3] = [&ascii::FONT_10X20, &ascii::FONT_9X15, &ascii::FONT_6X10];
 
-/// Corner radii, in tenths of a millimetre, so they scale with everything else.
+// Corner radii, in tenths of a millimetre, so they scale with everything else.
 const SHELL_RADIUS: i32 = 30;
 const KEY_RADIUS: i32 = 12;
 /// How far the well extends past the panel on each side.
@@ -78,9 +78,8 @@ pub fn paint(
 /// Everything that is not the device: what a board with no body, or one whose
 /// body is hidden, leaves around its panel.
 ///
-/// The window is fixed at the largest board it can show, so every smaller one
-/// is letterboxed into the middle of it, and something has to paint the margin
-/// or the board switched away from is still visible in it.
+/// Something has to paint the letterbox, or the board switched away from is
+/// still visible in it.
 pub fn backdrop(display: &mut SimulatorDisplay<Rgb888>) {
     let _ = display.clear(DESK);
 }
@@ -111,10 +110,10 @@ fn key(
     let (corner, (width, height)) = layout.key_face(button.centre, button.size);
     let face = rect(Point::new(corner.x, corner.y), (width, height));
 
-    // A key described as square is round on the device — the X4 Pro's Home key
-    // is the one of these there is. Drawing it with a corner radius of half its
-    // width is a circle, so the shape follows from the description rather than
-    // from a flag.
+    // A square face is drawn as a circle, a corner radius of half its width:
+    // the X4 Pro's round Home key, and every square-described key with it.
+    // Judged in window pixels, so a key that rounds to square at one zoom and
+    // not at another changes shape between them.
     let radius = if width == height {
         width / 2
     } else {

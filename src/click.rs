@@ -31,11 +31,6 @@ pub enum Hit {
 /// window's answer rather than one recomputed here — it already knows the
 /// inset and the scale, and a second copy of that arithmetic is exactly the
 /// drift this routing exists to avoid.
-///
-/// Only [`Hit::Panel`] carries a coordinate, and it is only ever the panel's.
-/// That is the shape of the rule that a click outside the panel is never a
-/// touch: there is no variant that could deliver a window pixel to a device
-/// that has no such coordinate.
 pub fn route(layout: Option<&BezelLayout>, window_point: Point, panel_point: Option<Point>) -> Hit {
     let on_body = layout.is_some_and(|layout| !layout.panel_holds(window_point));
 
@@ -47,8 +42,3 @@ pub fn route(layout: Option<&BezelLayout>, window_point: Point, panel_point: Opt
         },
     }
 }
-
-// What a press on the panel then *means* is not decided here. Routing answers
-// where a click landed; whether the contact it began was a tap, a drag or a
-// swipe belongs to the [`Touchscreen`](crate::Touchscreen), which measures in
-// panel pixels — the space the firmware's own thresholds are written in.

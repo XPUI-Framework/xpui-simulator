@@ -11,11 +11,9 @@ use xpui::{Point, SwipeDir};
 use super::{SWIPE_MAX_MS, SWIPE_MIN_PX};
 
 /// How close to a side edge a swipe must *start* to mean more than its
-/// direction, as a percentage of the panel. `EDGE_SWIPE_SIDE_FRAC` from the
-/// SDK's `FreeInkUICore.h:231-236`.
-///
-/// The sides get the wider band because "a thumb reaching in from the bezel
-/// lands further from the edge than a deliberate top/bottom pull".
+/// direction, as a percentage of the panel. The SDK's `EDGE_SWIPE_SIDE_FRAC`:
+/// the sides get the wider band because a thumb reaching in from the bezel
+/// lands further from the edge than a deliberate top/bottom pull.
 const SIDE_BAND_PERCENT: i32 = 25;
 
 /// The same, for the top and bottom edges. `EDGE_SWIPE_TOP_BOTTOM_FRAC`.
@@ -48,20 +46,16 @@ pub enum Touch {
     /// The finger came up. Reported whenever a contact ends, whatever else
     /// that contact turned out to be.
     Released,
-    /// A completed tap, at the position the finger went **down**.
-    ///
-    /// `InputManager.cpp:567-570`: "the reported centroid drifts 10-20px as a
-    /// finger rolls off during lift, which made small targets feel unreliable
-    /// with release-point routing. A tap routes to where the user touched, not
-    /// where the finger let go."
+    /// A completed tap, at the position the finger went **down**: the
+    /// centroid drifts 10-20px as a finger rolls off during lift, so a tap
+    /// routes to where the user touched, not where the finger let go.
     Tap(Point),
     /// A flick: far enough, fast enough.
     Swipe(SwipeDir),
     /// What that flick means, having started at an edge. Reported *alongside*
-    /// the swipe, as the firmware reports it — a consumer that honours the
-    /// gesture is the one that has to ignore the swipe, which is how
-    /// CrossPoint's reader keeps paging with a right swipe while the rest of
-    /// the system navigates back with one.
+    /// the swipe, as the firmware reports it: a consumer that honours the
+    /// gesture is the one that ignores the swipe, which is how a reader keeps
+    /// paging with a right swipe while the rest of the system goes back.
     Edge(EdgeGesture),
 }
 
@@ -126,10 +120,8 @@ impl IntoIterator for Touches {
 
 /// Whether a travel of `(dx, dy)` over `held_ms` was a flick.
 ///
-/// The distance is an **or**, not an and: `InputManager.cpp:700` rejects only a
-/// gesture short on *both* axes, so 60 px along either one qualifies. A
-/// mostly-horizontal swipe is not disqualified for having barely moved
-/// vertically.
+/// The distance is an **or**, not an and: the firmware rejects only a gesture
+/// short on *both* axes, so 60 px along either one qualifies.
 pub(super) fn swiped(dx: i32, dy: i32, held_ms: u32) -> bool {
     held_ms <= SWIPE_MAX_MS && (dx.abs() >= SWIPE_MIN_PX || dy.abs() >= SWIPE_MIN_PX)
 }
@@ -137,8 +129,7 @@ pub(super) fn swiped(dx: i32, dy: i32, held_ms: u32) -> bool {
 /// Which way a travel of `(dx, dy)` points: the dominant axis, ties going
 /// horizontal.
 ///
-/// The SDK's `swipeDirection` (`FreeInkUICore.h:217-227`), whose `adx >= ady`
-/// is what settles the tie.
+/// The SDK's `swipeDirection`, whose `adx >= ady` is what settles the tie.
 pub(super) fn direction(dx: i32, dy: i32) -> SwipeDir {
     if dx.abs() >= dy.abs() {
         if dx < 0 {
@@ -156,10 +147,9 @@ pub(super) fn direction(dx: i32, dy: i32) -> SwipeDir {
 /// What a swipe from `from` travelling `(dx, dy)` means on a panel of `size`,
 /// if it started near enough to an edge to mean anything.
 ///
-/// The SDK's `edgeSwipe` (`FreeInkUICore.h:238-267`). Each edge needs its own
-/// axis **strictly** dominant, so a perfect diagonal is neither gesture — and
-/// that is why [`direction`] cannot be reused here, since it breaks its ties
-/// towards the horizontal.
+/// The SDK's `edgeSwipe`. Each edge needs its own axis **strictly** dominant,
+/// so a perfect diagonal is neither gesture — which is why [`direction`], which
+/// breaks its ties towards the horizontal, cannot be reused here.
 pub(super) fn edge_gesture(size: (i32, i32), from: Point, dx: i32, dy: i32) -> Option<EdgeGesture> {
     let (width, height) = size;
     let horizontal = dx.abs() > dy.abs();

@@ -40,13 +40,10 @@ pub fn panel_point(
     }
 }
 
-/// Hands what the touchscreen decided to the backend, and to the app for the
-/// one gesture the framework owns rather than reports.
+/// Hands what the touchscreen decided to the backend, and to the app.
 pub fn deliver(backend: &Backend<PanelDisplay>, app: &mut App, touches: Touches) {
-    // An edge swipe arrives as both the swipe and its edge meaning, as it does
-    // on the device. Only the meaning is delivered: CrossPoint's
-    // `ActivityManager` consumes the home gesture before any activity sees the
-    // swipe (`ActivityManager.cpp:75-81`), and feeding both here would go home
+    // An edge swipe arrives as both the swipe and its edge meaning, as on the
+    // device, and only the meaning is delivered: feeding both would go home
     // and move focus down in the same frame.
     let edged = touches.iter().any(|touch| matches!(touch, Touch::Edge(_)));
 
@@ -60,10 +57,8 @@ pub fn deliver(backend: &Backend<PanelDisplay>, app: &mut App, touches: Touches)
             Touch::Edge(EdgeGesture::Back) => {
                 backend.input(|state| state.back_gesture());
                 // And as a `Back` press, which is what the gesture *is* on the
-                // device: `MappedInputManager.cpp:280-288` folds it into the
-                // logical button, so an activity handling the key handles the
-                // swipe without knowing there was one. Released in the same
-                // frame, or it would auto-repeat.
+                // device, so an activity handling the key handles the swipe.
+                // Released in the same frame, or it would auto-repeat.
                 backend.press(Button::Back);
                 backend.release(Button::Back);
             }
@@ -73,11 +68,9 @@ pub fn deliver(backend: &Backend<PanelDisplay>, app: &mut App, touches: Touches)
                 // same route the H key takes.
                 app.home_gesture();
             }
-            // Neither has anywhere to go yet: `InputSource` has no menu
-            // gesture and no long press, and CrossPoint's own FFI has no
-            // `cpp_input_was_menu_gesture` either. They are classified rather
-            // than dropped so that wiring one up is a change here and not a
-            // second touch model.
+            // Neither has anywhere to go: `InputSource` has no menu gesture
+            // and no long press. Classified rather than dropped, so wiring one
+            // up is a change here and not a second touch model.
             Touch::Edge(EdgeGesture::Menu) | Touch::LongPress(_) => {}
         }
     }
@@ -85,9 +78,8 @@ pub fn deliver(backend: &Backend<PanelDisplay>, app: &mut App, touches: Touches)
 
 /// What the window says a raw mouse position is on the panel.
 ///
-/// The window owns the inset and the scale and does the subtraction itself;
-/// a second copy of that arithmetic here is the drift the routing exists to
-/// avoid. `None` means the click was not on the panel at all.
+/// The window owns the inset and the scale and does the subtraction itself.
+/// `None` means the click was not on the panel at all.
 pub fn on_panel(
     backend: &Backend<PanelDisplay>,
     window: &MultiWindow,

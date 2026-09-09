@@ -129,18 +129,14 @@ pub use session::Session;
 pub use touch::{EdgeGesture, Touch, Touches, Touchscreen};
 pub use xpui_boards_core::Board;
 
-/// The crate's prose, compiled.
-///
-/// A README that does not build is worse than none: this crate's only usage
-/// example passed the wrong form to its own macro for as long as nothing
-/// tried it.
+/// The crate's prose, compiled: a README that does not build is worse than
+/// none.
 #[cfg(doctest)]
 mod guides {
     #[doc = include_str!("../README.md")]
     pub mod readme {}
-    /// `tests/keys.rs` also reads this file, but as *data* — it checks the key
-    /// table against `button_for`. Reading is not compiling, and for a while
-    /// that was mistaken for proof while both its Rust blocks went unbuilt.
+    /// `tests/keys.rs` also reads this file, as *data*: it checks the key
+    /// table against `button_for`. Reading is not compiling.
     #[doc = include_str!("../docs/running.md")]
     pub mod running {}
 }

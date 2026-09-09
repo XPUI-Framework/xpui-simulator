@@ -10,6 +10,9 @@ license = "MIT"
 authors = ["Thiago Holanda <unnamedd@gmail.com>"]
 repository = "https://github.com/XPUI-Framework/xpui-simulator"
 
+[lints]
+workspace = true
+
 [lib]
 name = "xpui_simulator"
 crate-type = ["rlib"]
@@ -23,15 +26,11 @@ xpui-boards-core = { git = "https://github.com/XPUI-Framework/xpui-boards", bran
 # The chrome it wires into a backend. The simulator stands in for a firmware,
 # and a firmware is what chooses measurements and words for its panel.
 xpui-chrome = { git = "https://github.com/XPUI-Framework/xpui-chrome", branch = "main" }
-# The backend it installs. No screenshot feature any more: the BMP writer it
-# uses for the screenshot key lives in `xpui-screenshot`, which does not drag
-# a PNG codec in behind it.
+# The backend it installs.
 xpui-embedded-graphics = { git = "https://github.com/XPUI-Framework/xpui-backends", branch = "main" }
-# `Framebuffer::new` and `write_bmp_in`, for the screenshot key. Without
-# `golden`: `write_bmp_in` hand-writes a BITMAPINFOHEADER and needs no image
-# codec. This crate compiles one anyway, because `embedded-graphics-simulator`
-# pulls `image` which pulls `png` — so the saving is not here, it is for
-# everyone else.
+# `Framebuffer::new` and `write_bmp_in`, for the screenshot key. The default
+# `golden` feature brings a PNG codec, which `embedded-graphics-simulator`
+# pulls in here anyway.
 xpui-screenshot = { git = "https://github.com/XPUI-Framework/xpui-backends", branch = "main" }
 embedded-graphics = "0.8"
 embedded-graphics-simulator = "0.8"
@@ -48,19 +47,20 @@ xpui = { git = "https://github.com/XPUI-Framework/xpui-framework", branch = "mai
 
 [workspace]
 # `xtask` is the gate. A member rather than a separate workspace so one
-# `cargo test` reaches its tests, and so the size ratchet counts its source
-# like any other.
+# `cargo test` reaches its tests.
 members = ["xtask"]
 
-# What a `cargo build --release` of this repository alone produces.
-#
-# It is **not** what ships. A library's profile applies only when that library
-# is the top of the build; when a firmware links it, the firmware's workspace
-# sets the profile for everything in the graph. So this exists to make a local
-# release build resemble the real one, not to control it.
-#
-# The repositories that do produce a flashed artifact — `xpui-rp2040`,
-# `xpui-esp32`, `xpui-cpp` — use `opt-level = "z"` and say why there.
+[workspace.lints.clippy]
+undocumented_unsafe_blocks = "deny"
+too_long_first_doc_paragraph = "deny"
+
+[workspace.lints.rustdoc]
+unescaped_backticks = "deny"
+
+# What a `cargo build --release` of this repository alone produces — not what
+# ships. A library's profile applies only at the top of a build; a firmware's
+# workspace sets the profile for everything it links; `xpui-rp2040`,
+# `xpui-esp32` and `xpui-cpp` use `opt-level = "z"`.
 [profile.release]
 opt-level = "s"
 lto = true

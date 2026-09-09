@@ -51,10 +51,7 @@ pub(crate) fn bind_panel(window: &mut MultiWindow, session: &Session) {
 }
 
 /// Repaints the device, or the bare desk when there is no body to draw.
-///
-/// Either way it covers the whole window, which is what erases the board
-/// switched away from rather than leaving it showing round the edges of a
-/// smaller one.
+/// Either way it covers the whole window.
 pub(crate) fn paint_body(
     window: &mut MultiWindow,
     body: &mut SimulatorDisplay<Rgb888>,

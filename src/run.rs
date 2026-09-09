@@ -73,7 +73,7 @@ impl Simulator {
     /// that the loop even starts — hangs until something kills it.
     ///
     /// ```bash
-    /// SDL_VIDEODRIVER=dummy cargo run -p xpui-gallery -- --frames 30
+    /// cd ../xpui-gallery && SDL_VIDEODRIVER=dummy cargo run -p xpui-gallery -- --frames 30
     /// ```
     pub fn frames(mut self, frames: u32) -> Self {
         self.max_frames = Some(frames);
@@ -342,7 +342,6 @@ impl Simulator {
     }
 }
 
-/// Whether either shift key was down.
 fn shifted(keymod: Mod) -> bool {
     keymod.intersects(Mod::LSHIFTMOD | Mod::RSHIFTMOD)
 }

@@ -25,25 +25,20 @@ use crate::panel::{Panel, PanelDisplay};
 
 /// The most window pixels one panel pixel may occupy.
 ///
-/// A ceiling above the real one. What actually limits zoom is the window, and
-/// on a reader-sized panel that stops at life size — a 480x800 panel in its
-/// body is already 1165 pixels tall, and doubling it needs a display nobody
-/// has. This number only ever binds on the small panels, which is exactly
-/// where zooming was wanted.
+/// A ceiling above the real one: the window is what actually limits zoom,
+/// and on a reader-sized panel that stops at life size. This number binds
+/// only on the small panels.
 const MAX_SCALE: u32 = 6;
 
 /// What the window is showing, and everything that can change about it.
 pub struct Session {
     /// Every board the board keys cycle through, in order.
     boards: Vec<Board>,
-    /// One backend per board, built the first time that board is shown.
+    /// One backend per board, built when that board is first shown.
     ///
-    /// The reuse is the point. Each backend is leaked — [`xpui::host::install`]
-    /// takes a `&'static` — so building a fresh one per switch would leak a
-    /// panel's worth of pixels every time B was pressed. Keyed by board
-    /// instead, the whole set is bounded at one per entry: under two megabytes
-    /// with every board visited, and not a byte more however long the cycling
-    /// goes on.
+    /// Each backend is leaked — [`xpui::host::install`] takes a `&'static` —
+    /// so keyed by board the set is bounded at one per entry, rather than a
+    /// panel's worth of pixels per press of B.
     panels: Vec<Option<&'static Backend<PanelDisplay>>>,
     /// How many have actually been built, which is how much has been leaked.
     ///
@@ -62,11 +57,8 @@ pub struct Session {
 impl Session {
     /// Opens on `panel`, and installs the backend behind it.
     ///
-    /// The cycle is that one board. This crate knows no devices — it is handed
-    /// one — so a list of somebody else's is not a defensible default, and an
-    /// empty cycle is not one either: the panel on screen is always somewhere
-    /// the board keys can be.
-    ///
+    /// The cycle is that one board: this crate knows no devices, and the
+    /// panel on screen is always somewhere the board keys can be.
     /// [`cycling`](Session::cycling) is how a caller offers more.
     pub fn new(panel: Panel) -> Session {
         Session::cycling(panel, &[panel.board])
@@ -104,17 +96,13 @@ impl Session {
         session
     }
 
-    /// The board on screen.
-    /// The cycle the board keys walk, in order.
-    ///
-    /// So an application can say at startup what `B` will do, the way a
-    /// firmware says which board it booted on. A window that opens on the
-    /// right panel and cycles the wrong list is otherwise something you find
-    /// by pressing a key.
+    /// The cycle the board keys walk, in order: what `B` will do, said at
+    /// startup rather than found by pressing it.
     pub fn boards(&self) -> &[Board] {
         &self.boards
     }
 
+    /// The board on screen.
     pub fn board(&self) -> Board {
         self.boards[self.index]
     }
@@ -252,6 +240,8 @@ impl Session {
                     board.ui_scale_percent,
                     !board.touch,
                 );
+                // `INK_IS_ON` is what `screenshot.rs` reads pixels by and
+                // what `window_settings`'s theme maps: change one, change all.
                 let backend = Backend::new(display, Palette::INK_IS_ON)
                     .with_metrics(metrics)
                     .with_labels(Labels::for_panel(board.width, board.height))
@@ -267,9 +257,9 @@ impl Session {
 
         // Safety: one thread, and no frame in flight. The events that ask for
         // this are drained before the frame they arrived in measures or paints
-        // anything, and the simulator has no second render task. The backend
-        // this replaces stays `&'static` and stays valid, so nothing that read
-        // the old one is left dangling.
+        // anything, and the simulator has no second render task. The old
+        // backend stays `&'static` and valid, so nothing that read it is left
+        // dangling.
         unsafe { xpui::host::install(backend) };
     }
 }
