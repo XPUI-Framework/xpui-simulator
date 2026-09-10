@@ -1,9 +1,10 @@
+[![CI](https://github.com/XPUI-Framework/xpui-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/XPUI-Framework/xpui-simulator/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 # `xpui-simulator`
 
-> ⚠️ **Under heavy development.** Not production-ready. The API can break
-> without notice. Use at your own risk.
-
-[![CI](https://github.com/XPUI-Framework/xpui-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/XPUI-Framework/xpui-simulator/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+> [!WARNING]
+> Under heavy development. Not production-ready. The API can break without
+> notice. Use at your own risk.
 
 Runs an [`xpui`](https://github.com/XPUI-Framework/xpui-framework) app in a
 desktop window, so screens can be developed without hardware. Not a separate
