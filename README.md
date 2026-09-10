@@ -3,8 +3,22 @@
 > ⚠️ **Under heavy development.** Not production-ready. The API can break
 > without notice. Use at your own risk.
 
-Runs an [`xpui`](https://github.com/XPUI-Framework/xpui-framework) app in a desktop window, so screens can be
-developed without hardware.
+[![CI](https://github.com/XPUI-Framework/xpui-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/XPUI-Framework/xpui-simulator/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+Runs an [`xpui`](https://github.com/XPUI-Framework/xpui-framework) app in a
+desktop window, so screens can be developed without hardware. Not a separate
+rendering backend: it is
+[`xpui-embedded-graphics`](https://github.com/XPUI-Framework/xpui-backends/tree/main/embedded_graphics)
+over `embedded-graphics-simulator`'s display, plus a window, an event pump and
+a keyboard mapping. **The pixels are the ones a device would get** — same
+backend, same components, same measurements.
+
+## Using it
+
+```toml
+[dependencies]
+xpui-simulator = { git = "https://github.com/XPUI-Framework/xpui-simulator", branch = "main" }
+```
 
 ```rust,no_run
 # use xpui::{Screen, Text, View};
@@ -19,8 +33,7 @@ use xpui_simulator::{Board, Panel, Simulator};
 
 fn main() {
     // Your panel. `xpui-boards-pimoroni`, `-xteink` and `-seeed` carry
-    // ready-made ones; this crate knows no device and opens whatever it is
-    // handed.
+    // ready-made ones.
     let mine = Board::custom("my reader", 480, 800, false);
     Simulator::new(Panel::of(mine))
         .title("my reader")
@@ -28,27 +41,11 @@ fn main() {
 }
 ```
 
-Not a separate rendering backend: it is
-[`xpui-embedded-graphics`](https://github.com/XPUI-Framework/xpui-backends/tree/main/embedded_graphics) over
-`embedded-graphics-simulator`'s display, plus a window, an event pump and a
-keyboard mapping. **The pixels are the ones a device would get** — same
-backend, same components, same measurements.
-
-## What it does, and where that is written down
-
-[`docs/running.md`](docs/running.md) is the guide.
-
-| | |
-|---|---|
-| [Running the gallery](docs/running.md#running-the-gallery) | `cargo run -p xpui-gallery -- --board x3`, and the seven slugs it takes |
-| [Boards](docs/running.md#boards) | `Panel::of(board)`, and `Simulator::boards(&[..])` for the cycle `B` walks |
-| [Keys and mouse](docs/running.md#keys-and-mouse) | what every key sends, and how a click becomes a tap |
-| [Changing it while it runs](docs/running.md#changing-it-while-it-runs) | board, zoom, body, screenshot — without restarting |
-| [The device around the panel](docs/running.md#the-device-around-the-panel) | the bezel drawn from millimetres, with clickable keys |
-| [`--frames N`](docs/running.md#--frames-n) | why the loop is testable, and how CI runs it |
-| [The mouse as a finger](docs/running.md#the-mouse-as-a-finger) | a drag is a swipe, the wheel is a scroll, and where the edge gestures live |
-| [Headless](docs/running.md#headless) | screenshots with no window, and no window at all |
-| [When it does not run](docs/running.md#when-it-does-not-run) | the failures people actually hit |
+`cargo run -p xpui-gallery` — the seven-board gallery this window was built
+around — lives in [`xpui-gallery`](https://github.com/XPUI-Framework/xpui-gallery),
+not here; this crate knows no device and no screen, and opens whatever board
+and screen it is handed. Nothing is on crates.io yet, which is why the dependency is
+a `git` URL.
 
 ## Requirements
 
@@ -68,14 +65,25 @@ apt install libsdl2-dev     # Debian/Ubuntu
 The checks are in [`xtask/`](xtask/) — this repository's own list, in Rust,
 holding nothing it does not run. There is no bare-metal lint here and there is
 no C++ stage: this crate opens a window, and runs on a desktop and nowhere
-else. `./build-and-test.sh fix` formats in place first.
+else. `./build-and-test.sh fix` formats in place first. How a change is
+reviewed is in [docs/contributing.md](docs/contributing.md).
 
-## Why the window redraws when nothing changed
+## Where next
 
-E-ink takes a second or more to refresh, so `App` only repaints when something
-actually changed. The window still has to be pumped every frame or the OS
-thinks the app has hung — so the loop pushes the unchanged framebuffer and
-sleeps, rather than spinning a core.
+| | |
+|---|---|
+| [docs/running.md](docs/running.md) | the operator's guide, in the sections below |
+| [Running the gallery](docs/running.md#running-the-gallery) | `cargo run -p xpui-gallery -- --board x3`, and the seven slugs it takes |
+| [Boards](docs/running.md#boards) | `Panel::of(board)`, and `Simulator::boards(&[..])` for the cycle `B` walks |
+| [Keys and mouse](docs/running.md#keys-and-mouse) | what every key sends, and how a click becomes a tap |
+| [Changing it while it runs](docs/running.md#changing-it-while-it-runs) | board, zoom, body, screenshot — without restarting |
+| [The device around the panel](docs/running.md#the-device-around-the-panel) | the bezel drawn from millimetres, with clickable keys |
+| [`--frames N`](docs/running.md#--frames-n) | why the loop is testable, and how CI runs it |
+| [The mouse as a finger](docs/running.md#the-mouse-as-a-finger) | a drag is a swipe, the wheel is a scroll, and where the edge gestures live |
+| [Headless](docs/running.md#headless) | screenshots with no window, and no window at all |
+| [When it does not run](docs/running.md#when-it-does-not-run) | the failures people actually hit |
+| [docs/design.md](docs/design.md) | why the window redraws when nothing changed, and the other arguments behind choices the code states in one sentence |
+| [docs/contributing.md](docs/contributing.md) | SDL2 first, then building it, the gate, the five review steps, and how a commit is written |
 
 ## Where it sits
 

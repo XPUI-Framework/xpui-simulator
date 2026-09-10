@@ -99,6 +99,8 @@
 //! [`Simulator::keys`] hands them over before the framework sees them. See
 //! [`Keys`].
 
+#![deny(missing_docs)]
+
 mod bezel;
 mod click;
 mod controls;
@@ -129,7 +131,7 @@ pub use session::Session;
 pub use touch::{EdgeGesture, Touch, Touches, Touchscreen};
 pub use xpui_boards_core::Board;
 
-/// The crate's prose, compiled: a README that does not build is worse than
+/// The crate's prose, compiled: a page that does not build is worse than
 /// none.
 #[cfg(doctest)]
 mod guides {
@@ -139,4 +141,6 @@ mod guides {
     /// table against `button_for`. Reading is not compiling.
     #[doc = include_str!("../docs/running.md")]
     pub mod running {}
+    #[doc = include_str!("../docs/design.md")]
+    pub mod design {}
 }

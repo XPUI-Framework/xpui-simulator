@@ -1,8 +1,8 @@
 //! What a raw press becomes before the framework sees it.
 //!
-//! Hardware sends presses; what two of them close together *mean* is the
-//! firmware's decision, so the presses arrive raw and a caller that wants to
-//! read something into them says so here. Two directions, deliberately not
+//! The presses arrive raw — what two of them close together *mean* is the
+//! firmware's decision, and `docs/design.md` says why — and a caller that
+//! wants to read something into them says so here. Two directions, deliberately not
 //! one. A **translation** ([`Keys::translate`]) renames a key that went down,
 //! and its release follows: a press translated to `Back` is released as
 //! `Back`, never as the key let go. An **injection** ([`Keys::due`]) is a
@@ -104,6 +104,7 @@ pub struct Keypad {
 }
 
 impl Keypad {
+    /// A keypad reading meaning into presses through `keys`, nothing down.
     pub fn new(keys: Box<dyn Keys>) -> Self {
         Keypad {
             keys,

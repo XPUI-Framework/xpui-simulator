@@ -1,15 +1,10 @@
 //! What a mouse becomes on a touchscreen.
 //!
-//! Classifying touch is the *simulator's* job and never the framework's:
-//! `xpui` is handed taps, drags, swipes and gestures, and where those came
-//! from is the host's business. The model is CrossPoint's, ported rule for
-//! rule and constant for constant, because a simulator that classifies
-//! differently agrees with the device right up to where it matters — the
-//! 45-pixel finger roll one slop calls nothing and the device calls a tap.
-//!
-//! Positions are *panel* pixels, the space a screen is laid out in and the
-//! firmware measures in; a window's own pixels would put every threshold
-//! somewhere else at every zoom. Nothing here touches SDL: a [`Touchscreen`]
+//! Classifying touch is the *simulator's* job and never the framework's, and
+//! the model is CrossPoint's, ported rule for rule and constant for constant;
+//! `docs/design.md` says why. Positions are *panel* pixels, the space a
+//! screen is laid out in and the firmware measures in. Nothing here touches
+//! SDL: a [`Touchscreen`]
 //! is driven by `(position, timestamp)` events, so every rule is a unit test.
 //! This file is the contact, from landing to lifting; [`gesture`] is what a
 //! finished travel means.
@@ -129,6 +124,7 @@ pub struct Touchscreen {
 }
 
 impl Touchscreen {
+    /// The touchscreen `board` has, or one that answers nothing if it has none.
     pub fn for_board(board: Board) -> Touchscreen {
         Touchscreen {
             size: (board.width, board.height),

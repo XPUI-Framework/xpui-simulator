@@ -19,7 +19,9 @@ pub type PanelDisplay = SimulatorDisplay<BinaryColor>;
 /// The panel to simulate.
 #[derive(Copy, Clone, Debug)]
 pub struct Panel {
+    /// The panel's width in its own pixels.
     pub width: i32,
+    /// The panel's height in its own pixels.
     pub height: i32,
     /// How many window pixels one panel pixel occupies. A 1-bit panel at 1:1
     /// is hard to read on a high-density display.
@@ -73,6 +75,8 @@ impl Panel {
         scale
     }
 
+    /// The same panel at `scale` window pixels per panel pixel. A session's
+    /// window is sized to fit it, so a large scale widens the whole window.
     pub fn scaled(mut self, scale: u32) -> Self {
         self.scale = scale;
         self

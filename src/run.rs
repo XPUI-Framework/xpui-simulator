@@ -31,6 +31,8 @@ pub struct Simulator {
 }
 
 impl Simulator {
+    /// A simulator that opens on `panel`, cycling that one board, titled
+    /// `xpui`, running until the window is closed, delivering presses raw.
     pub fn new(panel: Panel) -> Self {
         Simulator {
             panel,
@@ -51,6 +53,7 @@ impl Simulator {
         self
     }
 
+    /// The window's title.
     pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = title.into();
         self

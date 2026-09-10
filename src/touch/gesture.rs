@@ -96,14 +96,17 @@ impl Touches {
         self
     }
 
+    /// The events, in the order they happened.
     pub fn iter(&self) -> impl Iterator<Item = Touch> + '_ {
         self.events.iter().flatten().copied()
     }
 
+    /// Whether `touch` is among them.
     pub fn contains(&self, touch: Touch) -> bool {
         self.iter().any(|event| event == touch)
     }
 
+    /// Whether nothing happened.
     pub fn is_empty(&self) -> bool {
         self.events[0].is_none()
     }

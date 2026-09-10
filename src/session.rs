@@ -1,10 +1,8 @@
 //! Which board the window is showing, and changing it without restarting.
 //!
-//! The window cannot resize: `MultiWindow` fixes its SDL window and its
-//! streaming texture in the constructor, and there is no resize API. So the
-//! window is opened once, big enough for the largest board any key can reach,
-//! and every smaller one is letterboxed into the middle of it. Everything that
-//! follows from that — how far zoom may go, where the device sits, which
+//! The window cannot resize, so it is opened once, big enough for the largest
+//! board any key can reach, and every smaller one is letterboxed into the
+//! middle of it; `docs/design.md` says why. Everything that follows from that — how far zoom may go, where the device sits, which
 //! backend is installed — is decided here, and here only, so the painter and
 //! the event loop measure against one set of numbers.
 //!
