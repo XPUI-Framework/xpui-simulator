@@ -33,7 +33,7 @@ jobs:
       SDL_VIDEODRIVER: dummy
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # The simulator links SDL2, so the workspace does not build without it.
       - name: Install SDL2
