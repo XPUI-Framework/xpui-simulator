@@ -14,7 +14,7 @@ fn eg(at: xpui::Point) -> Point {
     Point::new(at.x, at.y)
 }
 use embedded_graphics_simulator::SimulatorDisplay;
-use xpui_simulator::{BezelLayout, Board, Panel, paint_body};
+use xpui_simulator::{BezelLayout, Board, Control, Panel, Session, paint_body};
 
 mod devices;
 
@@ -90,6 +90,83 @@ fn the_panel_sits_in_a_visible_well() {
             "{}: the panel's surround is the same colour as the body",
             board.name
         );
+    }
+}
+
+/// How much of a face's top-left corner is the key's own colour.
+///
+/// The corner is a quarter of the face's shorter side on each axis: a circle
+/// leaves most of it empty, a rounded rectangle fills most of it. The key's
+/// colour is the commonest one in its face, since a legend covers less.
+fn corner_filled(display: &SimulatorDisplay<Rgb888>, at: xpui::Point, size: (i32, i32)) -> f32 {
+    let mut counts: Vec<(Rgb888, usize)> = Vec::new();
+    for y in at.y..at.y + size.1 {
+        for x in at.x..at.x + size.0 {
+            let colour = display.get_pixel(Point::new(x, y));
+            match counts.iter_mut().find(|(seen, _)| *seen == colour) {
+                Some((_, count)) => *count += 1,
+                None => counts.push((colour, 1)),
+            }
+        }
+    }
+    let key = counts
+        .iter()
+        .max_by_key(|(_, count)| *count)
+        .map(|(colour, _)| *colour)
+        .expect("a face has pixels");
+
+    let side = (size.0.min(size.1) / 4).max(1);
+    let mut filled = 0;
+    for y in at.y..at.y + side {
+        for x in at.x..at.x + side {
+            filled += usize::from(display.get_pixel(Point::new(x, y)) == key);
+        }
+    }
+    filled as f32 / (side * side) as f32
+}
+
+/// A key's shape comes from the board, so zoom cannot change it: round when
+/// the board describes it square, a rounded rectangle otherwise.
+///
+/// In window pixels the two axes round separately, so a key 60 tenths of a
+/// millimetre each way is 79 × 79 at one scale and 53 × 52 at another — and
+/// a shape judged from those would alternate as the zoom keys are pressed.
+///
+/// Walked through every scale the zoom keys reach in the window the seven
+/// boards open, the one the gallery runs in.
+#[test]
+fn a_key_keeps_its_shape_at_every_zoom() {
+    for board in devices::ALL {
+        let Some(bezel) = board.bezel else { continue };
+        let mut session = Session::cycling(Panel::of(board), &devices::ALL);
+        while session.apply(Control::ZoomOut) {}
+
+        loop {
+            let scale = session.scale();
+            let layout = session.layout().expect("the body is shown");
+            let (width, height) = session.window_size();
+            let mut display = SimulatorDisplay::new(Size::new(width as u32, height as u32));
+            paint_body(&mut display, &layout, None);
+
+            for button in bezel.buttons {
+                let (corner, size) = layout.key_face(button.centre, button.size);
+                let filled = corner_filled(&display, corner, size);
+                let round = button.size.0 == button.size.1;
+                assert_eq!(
+                    filled < 0.5,
+                    round,
+                    "{}: {:?} at {scale}x is {}, its corner {:.0}% filled",
+                    board.name,
+                    button.label,
+                    if round { "not round" } else { "round" },
+                    filled * 100.0
+                );
+            }
+
+            if !session.apply(Control::ZoomIn) {
+                break;
+            }
+        }
     }
 }
 

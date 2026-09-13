@@ -2,9 +2,10 @@
 //!
 //! The window cannot resize, so it is opened once, big enough for the largest
 //! board any key can reach, and every smaller one is letterboxed into the
-//! middle of it; `docs/design.md` says why. Everything that follows from that — how far zoom may go, where the device sits, which
-//! backend is installed — is decided here, and here only, so the painter and
-//! the event loop measure against one set of numbers.
+//! middle of it; `docs/design.md` says why. Everything that follows from
+//! that — how far zoom may go, where the device sits, which backend is
+//! installed — is decided here, and here only, so the painter and the event
+//! loop measure against one set of numbers.
 //!
 //! Nothing in this file touches SDL. That is deliberate: switching board is
 //! the part worth testing, and a test that needs a window is a test nobody
@@ -67,7 +68,11 @@ impl Session {
     /// The order is the caller's, and so is the membership: an application
     /// simulating one panel nobody here has heard of gets the same window and
     /// the same keys as one offering seven.
+    ///
+    /// A panel scaled past what zoom can reach opens at that ceiling, so the
+    /// first press of `-` zooms out rather than a press of `+` shrinking it.
     pub fn cycling(panel: Panel, boards: &[Board]) -> Session {
+        let panel = panel.scaled(panel.scale.clamp(1, MAX_SCALE));
         let mut boards: Vec<Board> = boards.to_vec();
         let index = match boards.iter().position(|board| *board == panel.board) {
             Some(index) => index,
@@ -231,12 +236,13 @@ impl Session {
                     PanelDisplay::new(PixelSize::new(board.width as u32, board.height as u32));
                 // The simulator stands in for a firmware, so it wires a
                 // backend the way one does: measurements and words from the
-                // panel, keys and the Left/Right pair from the hardware.
+                // panel, keys and the Left/Right pair from the hardware, and a
+                // hint band only over a row of keys.
                 let metrics = Metrics::for_device(
                     board.width,
                     board.height,
                     board.ui_scale_percent,
-                    !board.touch,
+                    !board.keys.is_empty(),
                 );
                 // `INK_IS_ON` is what `screenshot.rs` reads pixels by and
                 // what `window_settings`'s theme maps: change one, change all.

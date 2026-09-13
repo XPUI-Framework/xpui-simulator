@@ -320,9 +320,8 @@ impl Simulator {
             }
 
             if !panel_dirty && !body_dirty {
-                // Nothing changed, so nothing is repainted. SDL still has to
-                // be pumped every frame or the OS decides the app has hung,
-                // and without a pause the loop spins a core doing exactly that.
+                // Nothing changed, so nothing is repainted, but the window is
+                // still pumped and the loop sleeps; `docs/design.md` says why.
                 std::thread::sleep(Duration::from_millis(8));
                 window.flush();
             } else {

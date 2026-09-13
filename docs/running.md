@@ -198,10 +198,8 @@ choosing that arrangement.
 
 ## Changing it while it runs
 
-Checking a screen on every panel used to be one `cargo run` per board, each
-losing whatever you had navigated to — and that state is usually the thing you
-wanted to look at. These keys change the simulator instead of restarting it,
-and the screen stack survives all of them.
+These keys change the simulator instead of restarting it, and the screen stack
+survives all of them.
 
 | Key | |
 |---|---|
@@ -223,16 +221,18 @@ two megabytes in total rather than a panel's worth of pixels per press.
 
 ### The window never resizes
 
-There is no resize API: `MultiWindow` fixes its SDL window and its streaming
-texture in the constructor. So the window is opened once, large enough for the
-largest board these keys can reach, and every smaller one is letterboxed into
-the middle of it. Hiding the body does not shrink the window — it grows the
-letterbox.
+The window is opened once, large enough for the largest board these keys can
+reach, and every smaller one is letterboxed into the middle of it;
+[design.md](design.md) says why it cannot resize. Hiding the body does not
+shrink the window — it grows the letterbox.
 
 That is also what limits zoom. A scale whose device would not fit the window is
 refused, and a 480 × 800 reader inside its body is already 1165 pixels tall, so
 those boards stay at life size. Zoom is for the small panels: a Badger 2040
-opens tripled, a Tufty 2040 doubled, and both go further with the body hidden.
+opens tripled and a Tufty 2040 doubled. In the window the gallery's seven
+open, hiding the body takes the Tufty one step further; the Badger stays at
+three, because its bare panel at four times is wider than any window it opens
+in.
 
 **Zoom changes nothing about the layout.** Scale is a window concern — the
 panel is the same number of pixels at 1× as at 3× — and a screen that
@@ -252,8 +252,8 @@ not overwrite an earlier one's. `XPUI_SCREENSHOT_DIR` moves them elsewhere.
 ## The mouse as a finger
 
 A click and drag goes through CrossPoint's touch model, ported constant for
-constant from the firmware's `InputManager`, so a gesture that works in this
-window works on the device and one the device would refuse is refused here.
+constant from the firmware's `InputManager`; why a port rather than a model of
+the simulator's own is in [design.md](design.md).
 
 | | |
 |---|---|
@@ -336,7 +336,7 @@ its own way of setting it, or none.
 ## Headless
 
 ```bash
-cd xpui-gallery
+cd ../xpui-gallery
 SDL_VIDEODRIVER=dummy cargo run -p xpui-gallery -- --frames 30
 ```
 
@@ -411,4 +411,4 @@ is how the other one ends up trusted.
 |---|---|
 | SDL2 not found at link time | Install it (above) and build again. |
 | No window on a remote session | Set `DISPLAY`, or run headless with `SDL_VIDEODRIVER=dummy`. |
-| The window redraws while nothing changes | Expected. E-ink refreshes slowly, so the app only repaints when something changed — but SDL still has to be pumped every frame or the OS decides the app has hung. The loop pushes the unchanged frame and sleeps rather than spinning a core. |
+| The window redraws while nothing changes | Expected; [design.md](design.md) says why. |

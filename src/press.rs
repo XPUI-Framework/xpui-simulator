@@ -2,12 +2,13 @@
 //!
 //! The presses arrive raw — what two of them close together *mean* is the
 //! firmware's decision, and `docs/design.md` says why — and a caller that
-//! wants to read something into them says so here. Two directions, deliberately not
-//! one. A **translation** ([`Keys::translate`]) renames a key that went down,
-//! and its release follows: a press translated to `Back` is released as
-//! `Back`, never as the key let go. An **injection** ([`Keys::due`]) is a
-//! press with no key behind it, produced by a timer, delivered as press and
-//! release in one frame because there is no finger to lift later.
+//! wants to read something into them says so here. Two directions,
+//! deliberately not one. A **translation** ([`Keys::translate`]) renames a
+//! key that went down, and its release follows: a press translated to `Back`
+//! is released as `Back`, never as the key let go. An **injection**
+//! ([`Keys::due`]) is a press with no key behind it, produced by a timer,
+//! delivered as press and release in one frame because there is no finger to
+//! lift later.
 
 use xpui::Button;
 use xpui_boards_core::Board;

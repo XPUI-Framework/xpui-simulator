@@ -122,7 +122,8 @@ fn a_board_without_touch_stays_without_touch() {
 /// `OutputSettingsBuilder::theme()` does `pixel_spacing.get_or_insert(1)` as a
 /// side effect, and the window is sized `size * scale + (size - 1) * spacing`.
 /// One pixel of gap therefore roughly doubles the window and halves every mouse
-/// coordinate, because the pitch used to unmap a click is `scale + spacing`.
+/// coordinate, because a click is unmapped through a pitch of
+/// `scale + spacing`.
 #[test]
 fn there_is_no_gap_between_panel_pixels() {
     for scale in 1..=3 {

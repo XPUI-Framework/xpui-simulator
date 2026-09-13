@@ -33,9 +33,11 @@ change is done, and read the real exit code.
 
 No check of its own in the gate, and one absence on purpose: no bare-metal
 clippy, because nothing here compiles for a device — the only other
-repository without one is `xpui-cpp`. What no sibling has is
-`tests/keys.rs`, the one prose-as-test in the organisation: it reads the key table in `docs/running.md` and checks every
-row against `button_for`.
+repositories without one of their own are `xpui-cpp` and `xpui-dev`. What no
+sibling has is `tests/keys.rs`, the one prose-as-test in the organisation: it
+reads both key tables in `docs/running.md`, and checks every row of the first
+against `button_for` and every row of the live-control table against
+`control_for`.
 
 ## Style that bites here
 
@@ -62,7 +64,8 @@ row against `button_for`.
 | Document | Proven by |
 |---|---|
 | [`README.md`](README.md) | its `rust` fence is a doctest (`no_run`: it opens a window), mounted by `src/lib.rs` |
-| [`docs/running.md`](docs/running.md) | doctests, mounted by `src/lib.rs`; its key table is read by `tests/keys.rs` |
+| [`docs/README.md`](docs/README.md) | its paths resolve; the README-heading check exempts it, because it is the index of `docs/`, not a front page |
+| [`docs/running.md`](docs/running.md) | doctests, mounted by `src/lib.rs`; both its key tables are read by `tests/keys.rs` |
 | [`docs/design.md`](docs/design.md) | its paths resolve; it carries no `rust` fence |
 | [`docs/contributing.md`](docs/contributing.md) | every path and command it gives resolves; the umbrella command is `xpui-dev`'s |
 | `AGENTS.md` | the stage list above is compared to what the gate runs |

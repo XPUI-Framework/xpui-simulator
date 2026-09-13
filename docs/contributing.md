@@ -3,9 +3,9 @@
 ## Building it
 
 SDL2 first: `embedded-graphics-simulator` links it, and without it nothing
-here compiles — `brew install sdl2` on macOS, `sudo apt install libsdl2-dev` on
-Debian and Ubuntu, as [`README.md`](../README.md) says. Then `rust-toolchain.toml` pins the rest, and every other
-dependency is a sibling repository fetched on `main`, apart from
+here compiles; [`README.md`](../README.md) gives the command for macOS and
+for Debian and Ubuntu. Then `rust-toolchain.toml` pins the rest, and every
+other dependency is a sibling repository fetched on `main`, apart from
 `embedded-graphics` and its simulator crate from crates.io.
 
 ```bash
@@ -20,8 +20,8 @@ command CI runs, so a green run locally means what a green tick means there.
 The checks are listed in [`AGENTS.md`](../AGENTS.md) and implemented in
 [`xtask/`](../xtask/); `./build-and-test.sh fix` formats in place first.
 
-What bites here — no test opens a window, the key table in
-[`docs/running.md`](running.md) is read by a test, the touch constants are
+What bites here — no test opens a window, both key tables in
+[`docs/running.md`](running.md) are read by a test, the touch constants are
 the firmware's verbatim — is in `AGENTS.md`'s `## Style that bites here`,
 once.
 

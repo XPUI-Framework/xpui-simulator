@@ -76,7 +76,9 @@ impl Panel {
     }
 
     /// The same panel at `scale` window pixels per panel pixel. A session's
-    /// window is sized to fit it, so a large scale widens the whole window.
+    /// window is sized to fit it, so a large scale widens the whole window —
+    /// up to six, the furthest zoom goes; a session opens anything larger at
+    /// six, and anything below one at one.
     pub fn scaled(mut self, scale: u32) -> Self {
         self.scale = scale;
         self

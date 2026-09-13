@@ -359,6 +359,22 @@ fn hiding_the_body_letterboxes_rather_than_resizes() {
     );
 }
 
+/// A panel scaled past the furthest zoom opens there, so `+` is refused and
+/// `-` zooms out, rather than the first press of `+` shrinking the panel.
+#[test]
+fn a_scale_past_the_ceiling_opens_at_it() {
+    let _guard = serial();
+
+    let mut session = Session::new(Panel::of(pimoroni::BADGER_2040).scaled(8));
+    assert_eq!(session.scale(), 6, "it opens at the ceiling");
+    assert!(!session.apply(Control::ZoomIn), "and zooms in no further");
+    assert!(session.apply(Control::ZoomOut));
+    assert_eq!(session.scale(), 5, "zooming out goes down from there");
+
+    let session = Session::new(Panel::of(pimoroni::BADGER_2040).scaled(0));
+    assert_eq!(session.scale(), 1, "and nothing opens below life size");
+}
+
 /// A board nobody here has heard of still gets a window it fits in, and joins
 /// the cycle rather than being lost at the first press of B.
 #[test]
@@ -387,9 +403,9 @@ fn a_board_of_someone_elses_is_carried_too() {
 
 /// A caller that named one board gets a cycle of one, and `B` does nothing.
 ///
-/// This is the default, and it is the whole of spec 38: before it, opening a
-/// window on one panel put six commercial devices nobody asked for behind the
-/// `B` key. A press that silently swaps the panel for somebody else's is worse
+/// This is the default, so opening a window on one panel puts no devices
+/// nobody asked for behind the `B` key. A press that silently swaps the panel
+/// for somebody else's is worse
 /// than a press that does nothing, because the window keeps painting and the
 /// numbers underneath it changed.
 #[test]

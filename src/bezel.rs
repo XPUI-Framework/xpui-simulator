@@ -110,12 +110,12 @@ fn key(
     let (corner, (width, height)) = layout.key_face(button.centre, button.size);
     let face = rect(Point::new(corner.x, corner.y), (width, height));
 
-    // A square face is drawn as a circle, a corner radius of half its width:
-    // the X4 Pro's round Home key, and every square-described key with it.
-    // Judged in window pixels, so a key that rounds to square at one zoom and
-    // not at another changes shape between them.
-    let radius = if width == height {
-        width / 2
+    // A key described square is drawn as a circle: the X4 Pro's round Home
+    // key, and every square-described key with it. Judged in the board's
+    // tenths of a millimetre, not in window pixels, where the two axes round
+    // separately and a key would change shape between one zoom and the next.
+    let radius = if button.size.0 == button.size.1 {
+        width.min(height) / 2
     } else {
         layout.to_window_size((KEY_RADIUS, KEY_RADIUS)).0
     };

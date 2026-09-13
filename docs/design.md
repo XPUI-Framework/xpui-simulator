@@ -17,7 +17,8 @@ sleeps, rather than spinning a core.
 is the host's business. The model is CrossPoint's, ported rule for rule and
 constant for constant, because a simulator that classifies differently agrees
 with the device right up to where it matters: the 45-pixel finger roll one
-slop calls nothing and the device calls a tap. Positions are panel pixels,
+slop calls nothing and the device calls a tap. The constants, and why the two
+slops differ, are in [running.md](running.md). Positions are panel pixels,
 the space a screen is laid out in; a window's own pixels would put every
 threshold somewhere else at every zoom.
 

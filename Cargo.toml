@@ -28,10 +28,10 @@ xpui-boards-core = { git = "https://github.com/XPUI-Framework/xpui-boards", bran
 xpui-chrome = { git = "https://github.com/XPUI-Framework/xpui-chrome", branch = "main" }
 # The backend it installs.
 xpui-embedded-graphics = { git = "https://github.com/XPUI-Framework/xpui-backends", branch = "main" }
-# `Framebuffer::new` and `write_bmp_in`, for the screenshot key. The default
-# `golden` feature brings a PNG codec, which `embedded-graphics-simulator`
-# pulls in here anyway.
-xpui-screenshot = { git = "https://github.com/XPUI-Framework/xpui-backends", branch = "main" }
+# `Framebuffer::new` and `write_bmp_in`, for the screenshot key, and nothing
+# more: without `golden`, so an application built on this crate is not handed
+# golden-image comparison it did not ask for.
+xpui-screenshot = { git = "https://github.com/XPUI-Framework/xpui-backends", branch = "main", default-features = false }
 embedded-graphics = "0.8"
 embedded-graphics-simulator = "0.8"
 
@@ -42,8 +42,10 @@ xpui-boards-pimoroni = { git = "https://github.com/XPUI-Framework/xpui-boards", 
 xpui-boards-seeed = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
 xpui-boards-xteink = { git = "https://github.com/XPUI-Framework/xpui-boards", branch = "main" }
 # The guide shows how to screenshot a screen without a window, and that block
-# is compiled rather than taken on trust.
+# is compiled rather than taken on trust. It asserts against a golden, which
+# is the feature the dependency above leaves off.
 xpui = { git = "https://github.com/XPUI-Framework/xpui-framework", branch = "main", features = ["testing"] }
+xpui-screenshot = { git = "https://github.com/XPUI-Framework/xpui-backends", branch = "main" }
 
 [workspace]
 # `xtask` is the gate. A member rather than a separate workspace so one

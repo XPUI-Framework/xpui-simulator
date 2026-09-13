@@ -1,7 +1,8 @@
 //! Real devices, for the tests only.
 //!
-//! This crate names no device — that is the point of it, and
-//! `crates/backend/simulator/src/` is greped to prove it. Its *tests* need
+//! This crate names no device — that is the point of it, and the vendor
+//! crates being dev-dependencies is what holds `src/` to it: nothing there
+//! can import one. Its *tests* need
 //! bodies with keys on them to be worth anything: a bezel with nothing in it
 //! cannot show that a click lands on the key under it, and a cycle of one
 //! cannot show that `B` walks the caller's order.

@@ -4,8 +4,8 @@
 //! the model is CrossPoint's, ported rule for rule and constant for constant;
 //! `docs/design.md` says why. Positions are *panel* pixels, the space a
 //! screen is laid out in and the firmware measures in. Nothing here touches
-//! SDL: a [`Touchscreen`]
-//! is driven by `(position, timestamp)` events, so every rule is a unit test.
+//! SDL: a [`Touchscreen`] is driven by `(position, timestamp)` events, so
+//! every rule is a unit test.
 //! This file is the contact, from landing to lifting; [`gesture`] is what a
 //! finished travel means.
 

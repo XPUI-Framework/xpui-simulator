@@ -4,8 +4,8 @@
 //! one colour, the panel well differs from the body around it, a held key
 //! changes. Those catch **blank**. They do not catch **wrong** — move a key
 //! six pixels and all three still pass, while a click lands on its neighbour.
-//! That is the same fault a dialog in this organisation once shipped, and the
-//! reason `crates/xpui` keeps a hit-test-versus-paint check of its own.
+//! A dialog check in `xpui` was loose in exactly that way; its
+//! `docs/testing.md` lists it among the tests that passed while wrong.
 //!
 //! So this pins the arithmetic instead of the pixels: window size, panel well,
 //! and every key's face, label **and action**, for all seven boards. The
