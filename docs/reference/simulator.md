@@ -1,8 +1,8 @@
-# Simulator
+# Window and session
 
 The window, the loop that drives it, and the session that loop keeps: which
 board is on screen, at what scale, and with or without its body. `Simulator` is
-what an application calls. `Session` is the same state without SDL, so a test
+what an application calls. `Session` is the same state without [SDL](https://www.libsdl.org/), so a test
 can switch boards and zoom with no window anywhere.
 
 [Running the simulator](../running.md) is the guide: the keys, the mouse, the
@@ -381,7 +381,7 @@ pub fn window_settings(scale: u32) -> OutputSettings
 
 `scale` window pixels per panel pixel, with no gap between pixels, and ink on
 paper: an `On` pixel is drawn `#1A1A1A` on `#F2F2EE`. The spacing is set
-explicitly, because `embedded-graphics-simulator`'s theme builder otherwise
+explicitly, because [`embedded-graphics-simulator`](https://crates.io/crates/embedded-graphics-simulator)'s theme builder otherwise
 adds a one-pixel gap, which doubles the window and halves every mouse
 coordinate.
 

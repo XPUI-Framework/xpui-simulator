@@ -2,11 +2,11 @@
 
 ## Building it
 
-SDL2 first: `embedded-graphics-simulator` links it, and without it nothing
+[SDL2](https://www.libsdl.org/) first: [`embedded-graphics-simulator`](https://crates.io/crates/embedded-graphics-simulator) links it, and without it nothing
 here compiles; [`README.md`](../README.md) gives the command for macOS and
-for Debian and Ubuntu. Then `rust-toolchain.toml` pins the rest, and every
+for [Debian](https://www.debian.org/) and [Ubuntu](https://ubuntu.com/). Then `rust-toolchain.toml` pins the rest, and every
 other dependency is a sibling repository fetched on `main`, apart from
-`embedded-graphics` and its simulator crate from crates.io.
+[`embedded-graphics`](https://crates.io/crates/embedded-graphics) and its simulator crate from [crates.io](https://crates.io/).
 
 ```bash
 cargo test                           # the suite, on a laptop; no window opens

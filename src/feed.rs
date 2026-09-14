@@ -3,13 +3,13 @@
 //! The window speaks in its own pixels and the framework speaks in the panel's.
 //! Between them sits the routing, which decides whether a position is on the
 //! panel at all, and the touchscreen, which decides what a contact *was*. This
-//! is where the two are handed to the backend, and the one gesture the
-//! framework owns rather than reports is handed to the app instead.
+//! is where what the two decided is handed to the backend, and to nothing
+//! else: the framework reads every gesture out of the backend's input.
 
 use embedded_graphics::geometry::Point as WindowPoint;
 use embedded_graphics_simulator::MultiWindow;
 
-use xpui::{App, Button, Point};
+use xpui::{Button, Point};
 use xpui_eg::Backend;
 
 use crate::click::{Hit, route};
@@ -40,8 +40,8 @@ pub fn panel_point(
     }
 }
 
-/// Hands what the touchscreen decided to the backend, and to the app.
-pub fn deliver(backend: &Backend<PanelDisplay>, app: &mut App, touches: Touches) {
+/// Hands what the touchscreen decided to the backend.
+pub fn deliver(backend: &Backend<PanelDisplay>, touches: Touches) {
     // An edge swipe arrives as both the swipe and its edge meaning, as on the
     // device, and only the meaning is delivered: feeding both would go home
     // and move focus down in the same frame.
@@ -62,16 +62,18 @@ pub fn deliver(backend: &Backend<PanelDisplay>, app: &mut App, touches: Touches)
                 backend.press(Button::Back);
                 backend.release(Button::Back);
             }
-            Touch::Edge(EdgeGesture::Home) => {
-                backend.input(|state| state.home_gesture());
-                // The system gesture, handled above the screen stack — the
-                // same route the H key takes.
-                app.home_gesture();
-            }
-            // Neither has anywhere to go: `InputSource` has no menu gesture
-            // and no long press. Classified rather than dropped, so wiring one
-            // up is a change here and not a second touch model.
-            Touch::Edge(EdgeGesture::Menu) | Touch::LongPress(_) => {}
+            // Into the backend's input and nowhere else: the app reads the home
+            // gesture from there when it ticks, so handing it to the app as
+            // well would offer it twice.
+            Touch::Edge(EdgeGesture::Home) => backend.input(|state| state.home_gesture()),
+            // Nothing of its own to deliver. The finger is still reported held
+            // on every frame, since `touch_down` lasts until `touch_up`, and a
+            // long press is the framework's to time from that.
+            Touch::LongPress(_) => {}
+            // Nowhere to go: `InputState` has no menu gesture. Classified rather
+            // than dropped, so wiring one up is a change here and not a second
+            // touch model.
+            Touch::Edge(EdgeGesture::Menu) => {}
         }
     }
 }

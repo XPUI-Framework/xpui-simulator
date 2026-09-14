@@ -1,13 +1,13 @@
-# Input
+# Keys and touch
 
 What the keyboard and the mouse become before the framework sees them. A key is
 a `Button` the hardware sent, handed to the caller's [`Keys`](#keys) to read
 meaning into. A click is routed to the panel, a physical key or bare shell, and
-a click on the panel goes through CrossPoint's touch model, ported constant for
+a click on the panel goes through [CrossPoint](https://crosspointreader.com/)'s touch model, ported constant for
 constant. The control keys change the window rather than the screen.
 
 Every piece here runs without a window: the event loop is the only part that
-needs SDL, and it does nothing to a press or a click that these do not.
+needs [SDL](https://www.libsdl.org/), and it does nothing to a press or a click that these do not.
 
 [Keys and mouse](../running.md#keys-and-mouse) and
 [The mouse as a finger](../running.md#the-mouse-as-a-finger) are the guide,
@@ -248,7 +248,7 @@ Named by meaning, never by position. The whole map is the key table in
 against this function row by row. **H** and **Q** are not in it: the loop
 handles them before this is asked.
 
-Escape is not `Back`, and cannot be. `embedded-graphics-simulator` turns it
+Escape is not `Back`, and cannot be. [`embedded-graphics-simulator`](https://crates.io/crates/embedded-graphics-simulator) turns it
 into a quit event before a key press exists to map.
 
 ```rust
@@ -457,9 +457,10 @@ What the window does with each:
 | Held, Released | the backend's touch down and touch up |
 | Tap | a tap at that panel pixel |
 | Swipe | a swipe, unless the same release also reported an edge gesture |
-| Edge, Back | the back gesture, and a press and release of `Back` |
-| Edge, Home | the home gesture, as **H** sends |
-| Edge, Menu; LongPress | nothing yet: classified, with nowhere in the framework to go |
+| Edge, Back | the backend's back gesture, and a press and release of `Back` |
+| Edge, Home | the backend's home gesture, and nothing else: the app reads it there when it ticks, so it is never offered twice |
+| LongPress | nothing of its own: the finger is still reported held on every frame, and the framework times a long press from that |
+| Edge, Menu | nothing: classified, with no slot in the backend's input to go to |
 
 An edge gesture is reported alongside its swipe, as the firmware reports it. A
 consumer that honours the gesture ignores the swipe, which is how a reader

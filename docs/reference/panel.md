@@ -1,4 +1,4 @@
-# Panel
+# Panel and body
 
 The panel a window shows, the display the firmware draws on, and the device
 body drawn round it from the board's millimetres. The panel is the anchor: it

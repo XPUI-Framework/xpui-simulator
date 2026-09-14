@@ -22,8 +22,8 @@ that would is marked `no_run`.
 ## Where the API documentation lives
 
 > [!NOTE]
-> **docs.rs may have no page for this crate.** `embedded-graphics-simulator`
-> links SDL2, and docs.rs builds without it, so a docs.rs build of
+> **[docs.rs](https://docs.rs/) may have no page for this crate.** [`embedded-graphics-simulator`](https://crates.io/crates/embedded-graphics-simulator)
+> links [SDL2](https://www.libsdl.org/), and docs.rs builds without it, so a docs.rs build of
 > `xpui-simulator` fails. Until the window is behind a feature a docs.rs build
 > can leave off, these pages are the reference, checked name for name against
 > rustdoc. With SDL2 installed, `cargo doc -p xpui-simulator --open` in a clone

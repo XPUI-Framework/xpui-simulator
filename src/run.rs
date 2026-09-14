@@ -242,7 +242,7 @@ impl Simulator {
                         let at = Point::new(point.x, point.y);
                         match route(layout.as_ref(), at, on_panel(backend, &window, point)) {
                             Hit::Panel(at_panel) => {
-                                deliver(backend, &mut app, touch.down(at_panel, now));
+                                deliver(backend, touch.down(at_panel, now));
                             }
                             Hit::Key(action) => {
                                 // Home is a gesture rather than a press: the
@@ -273,7 +273,7 @@ impl Simulator {
                             && let Some(at) =
                                 panel_point(backend, &window, session.layout().as_ref(), point)
                         {
-                            deliver(backend, &mut app, touch.moved(at));
+                            deliver(backend, touch.moved(at));
                         }
                     }
                     SimulatorEvent::MouseButtonUp { point, mouse_btn } => {
@@ -293,7 +293,7 @@ impl Simulator {
                         // being a sample of it: there is no panel pixel to say
                         // the finger lifted at.
                         let at = panel_point(backend, &window, session.layout().as_ref(), point);
-                        deliver(backend, &mut app, touch.up(at, now));
+                        deliver(backend, touch.up(at, now));
                     }
                     SimulatorEvent::MouseWheel { scroll_delta, .. } => {
                         let direction = match scroll_delta.y.signum() {
@@ -311,7 +311,7 @@ impl Simulator {
             // The long press is the one classification with no event behind
             // it: the finger is still down and still where it landed, and what
             // has changed is only the clock.
-            deliver(session.backend(), &mut app, touch.tick(now));
+            deliver(session.backend(), touch.tick(now));
 
             app.tick();
             let panel_dirty = app.render_if_dirty();

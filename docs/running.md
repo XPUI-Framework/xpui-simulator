@@ -9,13 +9,13 @@ running it.
 
 ## SDL2
 
-`embedded-graphics-simulator` links SDL2, so it has to be installed before
+[`embedded-graphics-simulator`](https://crates.io/crates/embedded-graphics-simulator) links [SDL2](https://www.libsdl.org/), so it has to be installed before
 anything here builds.
 
 | Platform | |
 |---|---|
 | macOS | `brew install sdl2` |
-| Linux, WSL | `sudo apt install libsdl2-dev` |
+| Linux, [WSL](https://learn.microsoft.com/en-us/windows/wsl/) | `sudo apt install libsdl2-dev` |
 
 Nothing else is needed. The simulator is a plain `cargo run`.
 
@@ -104,7 +104,7 @@ cargo run -p xpui-gallery -- --board inkyframe
 restarting — see [Changing it while it runs](#changing-it-while-it-runs) —
 which is the quicker way to see a screen on all of them.
 
-This is worth doing early rather than at the end. A Badger 2040's content band
+This is worth doing early rather than at the end. A [Badger 2040](https://shop.pimoroni.com/products/badger-2040)'s content band
 is 90 pixels; a screen that looks spacious at 480 × 800 can have nowhere to put
 its third row, and the panel is where you find that out. With the *default*
 chrome that band is 28 pixels and a list draws no rows at all, which is why
@@ -196,7 +196,7 @@ choosing that arrangement.
 |---|---|
 | Left click on the panel | a tap |
 | Left drag on the panel | held positions, then a swipe or a gesture on release |
-| Left press, held still | classified as a long press after half a second, which nothing receives yet |
+| Left press, held still | a held position on every frame, which is what the framework times a long press from |
 | Left click on a physical button | presses it, exactly as its key does |
 | Scroll wheel | a swipe: wheel up reports `SwipeDir::Down`, wheel down `SwipeDir::Up` |
 
@@ -236,7 +236,7 @@ shrink the window — it grows the letterbox.
 That is also what limits zoom. A scale whose device would not fit the window is
 refused, and a 480 × 800 reader inside its body is already 1165 pixels tall, so
 those boards stay at life size. Zoom is for the small panels: a Badger 2040
-opens tripled and a Tufty 2040 doubled. In the window the gallery's seven
+opens tripled and a [Tufty 2040](https://shop.pimoroni.com/products/tufty-2040) doubled. In the window the gallery's seven
 open, hiding the body takes the Tufty one step further; the Badger stays at
 three, because its bare panel at four times is wider than any window it opens
 in.
@@ -260,7 +260,7 @@ can call it with no window.
 
 ## The mouse as a finger
 
-A click and drag goes through CrossPoint's touch model, ported constant for
+A click and drag goes through [CrossPoint](https://crosspointreader.com/)'s touch model, ported constant for
 constant from the firmware's `InputManager`; why a port rather than a model of
 the simulator's own is in [design.md](design.md).
 
@@ -273,8 +273,12 @@ the simulator's own is in [design.md](design.md).
 | Home | an up swipe starting in the bottom **14%** |
 | Menu | a down swipe starting in the top **14%** |
 
-A long press and Menu are classified and then go nowhere: the framework's input
-has no slot for either yet. What each classification reaches is in
+Back and Home go into the backend's back and home gesture, where the framework
+reads them; Back is also sent as a press and release of `Back`, which is what
+the gesture is on the device. A long press needs no delivery of its own: the
+finger is reported held on every frame until it lifts, and the framework times
+the press from that. Menu is classified and goes nowhere, because the backend's
+input has no slot for it. What each classification reaches is in
 [`Touch`](reference/input.md#touch).
 
 Two of those numbers look like typos and are not. A tap survives 59 px while a

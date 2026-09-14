@@ -15,7 +15,7 @@ Runs an [`xpui`](https://github.com/XPUI-Framework/xpui-framework) app in a
 desktop window, so screens can be developed without hardware. Not a separate
 rendering backend: it is
 [`xpui-embedded-graphics`](https://github.com/XPUI-Framework/xpui-backends/tree/main/embedded_graphics)
-over `embedded-graphics-simulator`'s display, plus a window, an event pump and
+over [`embedded-graphics-simulator`](https://crates.io/crates/embedded-graphics-simulator)'s display, plus a window, an event pump and
 a keyboard mapping. **The pixels are the ones a device would get** — same
 backend, same components, same measurements.
 
@@ -52,12 +52,12 @@ fn main() {
 `cargo run -p xpui-gallery` — the seven-board gallery this window was built
 around — lives in [`xpui-gallery`](https://github.com/XPUI-Framework/xpui-gallery),
 not here; this crate knows no device and no screen, and opens whatever board
-and screen it is handed. Nothing is on crates.io yet, which is why the
+and screen it is handed. Nothing is on [crates.io](https://crates.io/) yet, which is why the
 dependency is a `git` URL.
 
 ## Requirements
 
-SDL2, which `embedded-graphics-simulator` needs.
+[SDL2](https://www.libsdl.org/), which `embedded-graphics-simulator` needs.
 
 ```bash
 brew install sdl2                # macOS
@@ -71,7 +71,7 @@ sudo apt install libsdl2-dev     # Debian/Ubuntu
 ```
 
 The checks themselves are in [`xtask/`](xtask/) — this repository's own list,
-in Rust, holding nothing it does not run. There is no bare-metal lint here and
+in [Rust](https://rust-lang.org/), holding nothing it does not run. There is no bare-metal lint here and
 there is no C++ stage: this crate opens a window, and runs on a desktop and
 nowhere else. `./build-and-test.sh fix` formats in place first. How a change
 is reviewed is in [docs/contributing.md](docs/contributing.md).

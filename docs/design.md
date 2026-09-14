@@ -14,7 +14,7 @@ sleeps, rather than spinning a core.
 ## Touch is classified here, never in the framework (`src/touch/`)
 
 `xpui` is handed taps, drags, swipes and gestures, and where those came from
-is the host's business. The model is CrossPoint's, ported rule for rule and
+is the host's business. The model is [CrossPoint](https://crosspointreader.com/)'s, ported rule for rule and
 constant for constant, because a simulator that classifies differently agrees
 with the device right up to where it matters: the 45-pixel finger roll one
 slop calls nothing and the device calls a tap. The constants, and why the two
@@ -24,7 +24,7 @@ threshold somewhere else at every zoom.
 
 ## The window never resizes (`Session`)
 
-`MultiWindow` fixes its SDL window and its streaming texture in the
+`MultiWindow` fixes its [SDL](https://www.libsdl.org/) window and its streaming texture in the
 constructor, and there is no resize API. So the window is opened once, big
 enough for the largest board any key can reach, and every smaller one is
 letterboxed into the middle of it. Everything that follows — how far zoom may

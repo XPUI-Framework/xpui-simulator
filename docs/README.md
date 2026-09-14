@@ -15,9 +15,9 @@ repository, and what each is for:
 | [The mouse as a finger](running.md#the-mouse-as-a-finger) | a drag is a swipe, the wheel is a scroll, and where the edge gestures live |
 | [Headless](running.md#headless) | screenshots with no window, and no window at all |
 | [When it does not run](running.md#when-it-does-not-run) | the failures people actually hit |
-| [reference.md](reference.md) | the whole public API, by area, and where the API documentation lives while docs.rs cannot build the crate |
+| [reference.md](reference.md) | the whole public API, by area, and where the API documentation lives while [docs.rs](https://docs.rs/) cannot build the crate |
 | [reference/simulator.md](reference/simulator.md) | `Simulator`, `Session`, `window_settings`, `open_frame` and `capture_panel` |
-| [reference/panel.md](reference/panel.md) | `Panel`, `PanelDisplay`, `BezelLayout` and `paint_body`, with the X3 drawn in its body |
+| [reference/panel.md](reference/panel.md) | `Panel`, `PanelDisplay`, `BezelLayout` and `paint_body`, with the [X3](https://www.xteink.com/products/xteink-x3) drawn in its body |
 | [reference/input.md](reference/input.md) | `Keys`, `Keypad`, `Press`, the touch model, click routing and the control keys |
 | [design.md](design.md) | why the window redraws when nothing changed, and the other arguments behind choices the code states in one sentence |
-| [contributing.md](contributing.md) | SDL2 first, then building it, the gate, the five review steps, and how a commit is written |
+| [contributing.md](contributing.md) | [SDL2](https://www.libsdl.org/) first, then building it, the gate, the five review steps, and how a commit is written |
