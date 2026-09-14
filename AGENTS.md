@@ -22,7 +22,7 @@ installed, which is what publishing it to docs.rs will have to solve.
 ```
 
 ```text
-format · file sizes · crates are tested · READMEs warn · prose is compiled · documented paths resolve · rustdoc links resolve · documented commands resolve · lint · tests · doctests · README sections · AGENTS.md · published crates deny missing_docs · comment blocks · comment narration
+format · file sizes · crates are tested · READMEs warn · prose is compiled · documented paths resolve · rustdoc links resolve · the reference mirrors rustdoc · documented commands resolve · lint · tests · doctests · README sections · AGENTS.md · published crates deny missing_docs · comment blocks · comment narration
 ```
 
 There is no `all` mode; this list is the whole of it, and a last stage,
@@ -66,6 +66,7 @@ against `button_for` and every row of the live-control table against
 | [`README.md`](README.md) | its `rust` fence is a doctest (`no_run`: it opens a window), mounted by `src/lib.rs` |
 | [`docs/README.md`](docs/README.md) | its paths resolve; the README-heading check exempts it, because it is the index of `docs/`, not a front page |
 | [`docs/running.md`](docs/running.md) | doctests, mounted by `src/lib.rs`; both its key tables are read by `tests/keys.rs` |
+| [`docs/reference.md`](docs/reference.md), [`docs/reference/`](docs/reference/) | doctests, mounted by `src/lib.rs`; every public name mirrored by `the reference mirrors rustdoc`; the picture on `panel.md` is the golden `tests/pictures.rs` draws |
 | [`docs/design.md`](docs/design.md) | its paths resolve; it carries no `rust` fence |
 | [`docs/contributing.md`](docs/contributing.md) | every path and command it gives resolves; the umbrella command is `xpui-dev`'s |
 | `AGENTS.md` | the stage list above is compared to what the gate runs |
