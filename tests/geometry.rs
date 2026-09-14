@@ -8,7 +8,7 @@
 //! `docs/testing.md` lists it among the tests that passed while wrong.
 //!
 //! So this pins the arithmetic instead of the pixels: window size, panel well,
-//! and every key's face, label **and action**, for all seven boards. The
+//! and every key's face, label **and action**, for all eight boards. The
 //! action is the more important half — the regression above was about what a
 //! key *sends*, not what it says. Text rather than an
 //! image, and not for want of a harness — `xpui-screenshot`'s golden is
@@ -77,7 +77,7 @@ fn describe(board: Board) -> String {
     // `to_window` speaks the bezel's units — tenths of a millimetre from the
     // body's top-left — so the well is `panel_origin`, not (0,0). Passing
     // (0,0) reports the body's own corner, which is (0,0) for every board and
-    // therefore looks plausible in all seven goldens while measuring nothing.
+    // therefore looks plausible in all eight goldens while measuring nothing.
     let origin = layout.to_window(bezel.panel_origin);
     let size = layout.to_window_size(bezel.panel_size);
     writeln!(

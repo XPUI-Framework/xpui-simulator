@@ -63,7 +63,7 @@
 //!
 //! **`B` walks the cycle its caller supplied**, and the example above supplied
 //! one board, so it does nothing there. [`Simulator::boards`] is where an
-//! application offers more; `xpui-gallery`'s offers seven.
+//! application offers more; `xpui-gallery`'s offers eight.
 //!
 //! The screen stack survives a board switch: the same screen you had navigated
 //! to is re-measured against the new panel and painted on it, which is the

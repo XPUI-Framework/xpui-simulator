@@ -1,11 +1,11 @@
 board       Xteink X4 (x4)
 panel       480x800 at scale 1
-window      662x1165
-well        (62,91) 480x800
-key         (17,994) 131x68 "Back" -> Press(Back)
-key         (183,994) 131x68 "Select" -> Press(Confirm)
-key         (348,994) 131x68 "Up" -> Press(Left)
-key         (514,994) 131x68 "Down" -> Press(Right)
-key         (574,212) 57x125 "Sleep" -> Press(Power)
-key         (574,394) 57x160 "Prev" -> Press(PageBack)
-key         (574,611) 57x160 "Next" -> Press(PageForward)
+window      617x1075
+well        (47,68) 480x800
+key         (27,947) 99x51 "Back" -> Press(Back)
+key         (181,947) 99x51 "Select" -> Press(Confirm)
+key         (337,947) 99x51 "Up" -> Press(Left)
+key         (491,947) 99x51 "Down" -> Press(Right)
+key         (551,258) 43x94 "Sleep" -> Press(Power)
+key         (551,396) 43x120 "Prev" -> Press(PageBack)
+key         (551,559) 43x120 "Next" -> Press(PageForward)

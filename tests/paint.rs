@@ -132,7 +132,7 @@ fn corner_filled(display: &SimulatorDisplay<Rgb888>, at: xpui::Point, size: (i32
 /// millimetre each way is 79 × 79 at one scale and 53 × 52 at another — and
 /// a shape judged from those would alternate as the zoom keys are pressed.
 ///
-/// Walked through every scale the zoom keys reach in the window the seven
+/// Walked through every scale the zoom keys reach in the window the eight
 /// boards open, the one the gallery runs in.
 #[test]
 fn a_key_keeps_its_shape_at_every_zoom() {

@@ -1,0 +1,11 @@
+board       Xteink X4 Classic (x4classic)
+panel       480x800 at scale 1
+window      594x982
+well        (57,68) 480x800
+key         (25,900) 99x51 "Back" -> Press(Back)
+key         (173,900) 99x51 "Select" -> Press(Confirm)
+key         (322,900) 99x51 "Up" -> Press(Left)
+key         (470,900) 99x51 "Down" -> Press(Right)
+key         (11,400) 37x137 "Prev" -> Press(PageBack)
+key         (548,334) 37x94 "Sleep" -> Press(Power)
+key         (548,467) 37x137 "Next" -> Press(PageForward)

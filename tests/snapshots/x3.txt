@@ -1,11 +1,11 @@
 board       Xteink X3 (x3)
 panel       528x792 at scale 1
-window      696x1134
-well        (84,89) 528x792
-key         (16,975) 140x67 "Back" -> Press(Back)
-key         (190,975) 140x67 "Select" -> Press(Confirm)
-key         (364,975) 140x67 "Up" -> Press(Left)
-key         (538,975) 140x67 "Down" -> Press(Right)
-key         (14,391) 56x190 "Prev" -> Press(PageBack)
-key         (625,301) 56x123 "Sleep" -> Press(Power)
-key         (625,481) 56x190 "Next" -> Press(PageForward)
+window      680x1100
+well        (76,81) 528x792
+key         (21,957) 126x60 "Back" -> Press(Back)
+key         (191,957) 126x60 "Select" -> Press(Confirm)
+key         (361,957) 126x60 "Up" -> Press(Left)
+key         (531,957) 126x60 "Down" -> Press(Right)
+key         (13,391) 50x172 "Prev" -> Press(PageBack)
+key         (616,310) 50x111 "Sleep" -> Press(Power)
+key         (616,472) 50x172 "Next" -> Press(PageForward)

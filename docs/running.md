@@ -73,7 +73,7 @@ show at 1:1; a 296 × 128 strip at 1:1 is a postage stamp, so it is tripled.
 
 The board keys walk one board by default: the one the panel was opened on.
 `Simulator::boards(&[..])` is how an application offers more, in its own order.
-`xpui-gallery`'s `gallery/src/main.rs` passes all seven.
+`xpui-gallery`'s `gallery/src/main.rs` passes all eight.
 
 `Panel::of(..).scaled(n)` overrides that. Scale is a window concern: doubling
 every panel pixel changes nothing about what the screen is laid out against.
@@ -93,6 +93,7 @@ strip is not a postage stamp on a modern display.
 cd ../xpui-gallery
 cargo run -p xpui-gallery -- --board x4            # the default
 cargo run -p xpui-gallery -- --board x3
+cargo run -p xpui-gallery -- --board x4classic     # the X4's keys, a page key on each edge
 cargo run -p xpui-gallery -- --board x4pro         # the touch reader
 cargo run -p xpui-gallery -- --board sticky
 cargo run -p xpui-gallery -- --board badger2040
@@ -234,9 +235,9 @@ reach, and every smaller one is letterboxed into the middle of it;
 shrink the window — it grows the letterbox.
 
 That is also what limits zoom. A scale whose device would not fit the window is
-refused, and a 480 × 800 reader inside its body is already 1165 pixels tall, so
+refused, and a 480 × 800 reader inside its body is already 1075 pixels tall, so
 those boards stay at life size. Zoom is for the small panels: a Badger 2040
-opens tripled and a [Tufty 2040](https://shop.pimoroni.com/products/tufty-2040) doubled. In the window the gallery's seven
+opens tripled and a [Tufty 2040](https://shop.pimoroni.com/products/tufty-2040) doubled. In the window the gallery's eight
 open, hiding the body takes the Tufty one step further; the Badger stays at
 three, because its bare panel at four times is wider than any window it opens
 in.
@@ -409,8 +410,8 @@ render what came back.
 is the shortest worked example of the assertion above.
 [`xpui-gallery`'s `gallery/tests/screenshots.rs`](https://github.com/XPUI-Framework/xpui-gallery/blob/main/gallery/tests/screenshots.rs)
 is the fuller one: it pairs goldens with `ink_in` checks like the one beside
-the assertion above, and runs the pair across the gallery's seven — nine screens on
-seven panels, each against a PNG committed as `<screen>_<board slug>.png`,
+the assertion above, and runs the pair across the gallery's eight — ten screens on
+eight panels, each against a PNG committed as `<screen>_<board slug>.png`,
 pixel for pixel. That one calls `check_screenshot` rather than
 `assert_screenshot`, the same comparison handing its report back instead of
 panicking with it, so a run names every board that moved rather than the first.

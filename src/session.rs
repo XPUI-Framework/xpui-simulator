@@ -67,7 +67,7 @@ impl Session {
     ///
     /// The order is the caller's, and so is the membership: an application
     /// simulating one panel nobody here has heard of gets the same window and
-    /// the same keys as one offering seven.
+    /// the same keys as one offering eight.
     ///
     /// A panel scaled past what zoom can reach opens at that ceiling, so the
     /// first press of `-` zooms out rather than a press of `+` shrinking it.

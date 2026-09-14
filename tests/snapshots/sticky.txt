@@ -1,7 +1,7 @@
 board       Seeed Sticky (sticky)
 panel       480x800 at scale 1
-window      597x1077
-well        (35,101) 480x800
-key         (532,241) 46x128 "OK" -> Press(Confirm)
-key         (532,416) 46x149 "Prev" -> Press(PageBack)
-key         (532,612) 46x149 "Next" -> Press(PageForward)
+window      581x1040
+well        (30,87) 480x800
+key         (525,263) 40x110 "OK" -> Press(Confirm)
+key         (525,415) 40x129 "Prev" -> Press(PageBack)
+key         (525,585) 40x129 "Next" -> Press(PageForward)

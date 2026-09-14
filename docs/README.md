@@ -6,7 +6,7 @@ repository, and what each is for:
 | | |
 |---|---|
 | [running.md](running.md) | the operator's guide, in the sections below |
-| [Running the gallery](running.md#running-the-gallery) | `cargo run -p xpui-gallery -- --board x3`, and the seven slugs it takes |
+| [Running the gallery](running.md#running-the-gallery) | `cargo run -p xpui-gallery -- --board x3`, and the eight slugs it takes |
 | [Boards](running.md#boards) | `Panel::of(board)`, and `Simulator::boards(&[..])` for the cycle `B` walks |
 | [Keys and mouse](running.md#keys-and-mouse) | what every key sends, and how a click becomes a tap |
 | [Changing it while it runs](running.md#changing-it-while-it-runs) | board, zoom, body, screenshot — without restarting |

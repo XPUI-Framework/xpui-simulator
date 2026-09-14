@@ -152,14 +152,20 @@ fn a_click_on_the_panel_arrives_in_panel_pixels() {
 /// The inset itself, checked against the body rather than against the code
 /// that produced it. Without this the test above passes even when the offset
 /// is wrong, because it builds its own click out of the same wrong number.
+///
+/// Both conversions truncate, so the round trip may fall short by up to one
+/// window pixel of tenths and one tenth more — two on an X4, whose pixel is
+/// 1.16 tenths tall. A wrong inset misses by tens.
 #[test]
 fn the_panel_is_inset_where_the_body_says_it_is() {
     for (board, _, layout) in bezelled() {
         let origin = layout.bezel().panel_origin;
         let back = layout.to_device(layout.panel_offset());
+        let (panel, pixels) = (layout.bezel().panel_size, layout.panel_size());
+        let slack = (panel.0 / pixels.0 + 1, panel.1 / pixels.1 + 1);
 
         assert!(
-            (back.0 - origin.0).abs() <= 1 && (back.1 - origin.1).abs() <= 1,
+            (back.0 - origin.0).abs() <= slack.0 && (back.1 - origin.1).abs() <= slack.1,
             "{}: the panel is inset at {:?}, which is {back:?} on the device — \
              the body puts it at {origin:?}",
             board.name,

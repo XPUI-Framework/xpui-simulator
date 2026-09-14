@@ -49,7 +49,7 @@ fn main() {
 }
 ```
 
-`cargo run -p xpui-gallery` — the seven-board gallery this window was built
+`cargo run -p xpui-gallery` — the eight-board gallery this window was built
 around — lives in [`xpui-gallery`](https://github.com/XPUI-Framework/xpui-gallery),
 not here; this crate knows no device and no screen, and opens whatever board
 and screen it is handed. Nothing is on [crates.io](https://crates.io/) yet, which is why the
@@ -88,7 +88,7 @@ than through whoever happens to sit above it.
 flowchart TD
   xpui["xpui<br/>the framework"]
   chrome["xpui-chrome<br/>components"]
-  boards["xpui-boards<br/>seven devices"]
+  boards["xpui-boards<br/>eight devices"]
   backends["xpui-backends<br/>two backends"]
   simulator["xpui-simulator<br/>a window"]
   gallery["xpui-gallery<br/>the app"]
