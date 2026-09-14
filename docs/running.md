@@ -77,6 +77,7 @@ The board keys walk one board by default: the one the panel was opened on.
 
 `Panel::of(..).scaled(n)` overrides that. Scale is a window concern: doubling
 every panel pixel changes nothing about what the screen is laid out against.
+Every field and method is in [the panel reference](reference/panel.md#panel).
 
 ## Boards
 
@@ -181,6 +182,9 @@ Two directions, and they are not the same thing:
   a press *and* its release in the same frame, because there is no finger to
   lift later and a button left held auto-repeats.
 
+The third method, `reset`, and [`Keypad`](reference/input.md#keypad), which
+drives all three with no window, are in [the input reference](reference/input.md#keys).
+
 The gallery installs a reader for both, though no board here needs it: every
 one has a Back key of its own, so presses pass straight through. On a board
 with three keys and no spare, the reader swallows the first press of the
@@ -192,7 +196,7 @@ choosing that arrangement.
 |---|---|
 | Left click on the panel | a tap |
 | Left drag on the panel | held positions, then a swipe or a gesture on release |
-| Left press, held still | a long press after half a second |
+| Left press, held still | classified as a long press after half a second, which nothing receives yet |
 | Left click on a physical button | presses it, exactly as its key does |
 | Scroll wheel | a swipe: wheel up reports `SwipeDir::Down`, wheel down `SwipeDir::Up` |
 
@@ -209,6 +213,9 @@ survives all of them.
 | - | zoom out, down to life size |
 | E | show or hide the device body |
 | S | write the panel to `target/screenshots/` and print the path |
+
+Each is a [`Control`](reference/input.md#control), applied by
+[`Session::apply`](reference/simulator.md#sessionapply).
 
 Switching board installs a different backend, because a different panel size
 needs one. The screens carry on running on it: the app owns the stack, and the
@@ -248,6 +255,8 @@ The file is a 1-bit BMP named `<slug>-<n>.bmp`, and its path is printed — a
 screenshot you cannot find is not a screenshot. `n` is the first number not
 already taken, so pressing the key twice gives two files and a later run does
 not overwrite an earlier one's. `XPUI_SCREENSHOT_DIR` moves them elsewhere.
+[`capture_panel`](reference/simulator.md#capture_panel) writes it, and a test
+can call it with no window.
 
 ## The mouse as a finger
 
@@ -263,6 +272,10 @@ the simulator's own is in [design.md](design.md).
 | Back | a right swipe starting in the left **25%** |
 | Home | an up swipe starting in the bottom **14%** |
 | Menu | a down swipe starting in the top **14%** |
+
+A long press and Menu are classified and then go nowhere: the framework's input
+has no slot for either yet. What each classification reaches is in
+[`Touch`](reference/input.md#touch).
 
 Two of those numbers look like typos and are not. A tap survives 59 px while a
 long press dies at 28, because they answer different questions: one asks
