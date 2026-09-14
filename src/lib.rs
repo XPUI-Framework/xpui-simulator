@@ -143,4 +143,12 @@ mod guides {
     pub mod running {}
     #[doc = include_str!("../docs/design.md")]
     pub mod design {}
+    #[doc = include_str!("../docs/reference.md")]
+    pub mod reference {}
+    #[doc = include_str!("../docs/reference/simulator.md")]
+    pub mod reference_simulator {}
+    #[doc = include_str!("../docs/reference/panel.md")]
+    pub mod reference_panel {}
+    #[doc = include_str!("../docs/reference/input.md")]
+    pub mod reference_input {}
 }

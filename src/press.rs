@@ -26,8 +26,9 @@ pub struct Press {
     /// reads anything into it.
     pub button: Button,
     /// Milliseconds since the run started, the same reading the framework is
-    /// given this frame. A window measured against a different clock closes on
-    /// the wrong frame.
+    /// given this frame.
+    ///
+    /// A window measured against a different clock closes on the wrong frame.
     pub now: u32,
     /// The device this press came from.
     ///
@@ -113,7 +114,7 @@ impl Keypad {
         }
     }
 
-    /// A key went down on `board`. Delivers whatever it turned out to mean.
+    /// A key went down on `board`, delivered as whatever it turned out to mean.
     pub fn down(
         &mut self,
         backend: &Backend<PanelDisplay>,
@@ -134,7 +135,7 @@ impl Keypad {
         backend.press(meaning);
     }
 
-    /// A key came up. Releases what it was delivered as, if it was delivered.
+    /// A key came up, released as whatever it was delivered as, if it was delivered.
     pub fn up(&mut self, backend: &Backend<PanelDisplay>, button: Button) {
         let Some(at) = self.down.iter().position(|(raw, _)| *raw == button) else {
             return;

@@ -23,8 +23,9 @@ pub struct Panel {
     pub width: i32,
     /// The panel's height in its own pixels.
     pub height: i32,
-    /// How many window pixels one panel pixel occupies. A 1-bit panel at 1:1
-    /// is hard to read on a high-density display.
+    /// How many window pixels one panel pixel occupies.
+    ///
+    /// A 1-bit panel at 1:1 is hard to read on a high-density display.
     pub scale: u32,
     /// The device being simulated, passed to the backend whole.
     ///
@@ -75,10 +76,11 @@ impl Panel {
         scale
     }
 
-    /// The same panel at `scale` window pixels per panel pixel. A session's
-    /// window is sized to fit it, so a large scale widens the whole window —
-    /// up to six, the furthest zoom goes; a session opens anything larger at
-    /// six, and anything below one at one.
+    /// The same panel at `scale` window pixels per panel pixel.
+    ///
+    /// A session's window is sized to fit it, so a large scale widens the whole
+    /// window — up to six, the furthest zoom goes; a session opens anything
+    /// larger at six, and anything below one at one.
     pub fn scaled(mut self, scale: u32) -> Self {
         self.scale = scale;
         self
@@ -98,8 +100,9 @@ impl Panel {
         Panel::window_for(self.board, self.scale)
     }
 
-    /// The panel's own size in window pixels, before any body is drawn round
-    /// it. The whole window when the board has no bezel.
+    /// The panel's own size in window pixels, before any body is drawn round it.
+    ///
+    /// The whole window when the board has no bezel.
     pub const fn size_in_window(&self) -> (i32, i32) {
         (
             self.width * self.scale as i32,
@@ -108,8 +111,9 @@ impl Panel {
     }
 }
 
-/// How the window presents one panel pixel. Out of line so a test can read
-/// it back.
+/// How the window presents one panel pixel.
+///
+/// Out of line so a test can read it back.
 pub fn window_settings(scale: u32) -> OutputSettings {
     OutputSettingsBuilder::new()
         .scale(scale)

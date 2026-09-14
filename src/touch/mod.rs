@@ -177,8 +177,10 @@ impl Touchscreen {
         Touches::of(Touch::LongPress(contact.down))
     }
 
-    /// The finger lifted. `at` is `Some` when the release landed on the panel,
-    /// in which case it counts as one last sample of the contact.
+    /// The finger lifted, at `at` if the release landed on the panel.
+    ///
+    /// A release on the panel counts as one last sample of the contact; `None`
+    /// ends the contact where its previous sample left it.
     pub fn up(&mut self, at: Option<Point>, now_ms: u32) -> Touches {
         let Some(mut contact) = self.contact.take() else {
             return Touches::NONE;

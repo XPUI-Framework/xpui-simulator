@@ -37,14 +37,18 @@ pub enum EdgeGesture {
 /// What one raw event turned into.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Touch {
-    /// A finger is down, at this pixel. Reported for every sample of the
-    /// contact, which is the signal a drag needs.
+    /// A finger is down, at this pixel.
+    ///
+    /// Reported for every sample of the contact, which is the signal a drag
+    /// needs.
     Held(Point),
     /// Still down, still stationary, and now past the long-press interval — at
     /// the position it went *down*, for the same reason a tap is.
     LongPress(Point),
-    /// The finger came up. Reported whenever a contact ends, whatever else
-    /// that contact turned out to be.
+    /// The finger came up.
+    ///
+    /// Reported whenever a contact ends, whatever else that contact turned out
+    /// to be.
     Released,
     /// A completed tap, at the position the finger went **down**: the
     /// centroid drifts 10-20px as a finger rolls off during lift, so a tap
@@ -52,10 +56,12 @@ pub enum Touch {
     Tap(Point),
     /// A flick: far enough, fast enough.
     Swipe(SwipeDir),
-    /// What that flick means, having started at an edge. Reported *alongside*
-    /// the swipe, as the firmware reports it: a consumer that honours the
-    /// gesture is the one that ignores the swipe, which is how a reader keeps
-    /// paging with a right swipe while the rest of the system goes back.
+    /// What that flick means, having started at an edge.
+    ///
+    /// Reported *alongside* the swipe, as the firmware reports it: a consumer
+    /// that honours the gesture is the one that ignores the swipe, which is how
+    /// a reader keeps paging with a right swipe while the rest of the system
+    /// goes back.
     Edge(EdgeGesture),
 }
 
