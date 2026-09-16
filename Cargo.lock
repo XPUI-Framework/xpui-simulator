@@ -362,7 +362,7 @@ source = "git+https://github.com/XPUI-Framework/xpui-framework?branch=main#3f8a6
 [[package]]
 name = "xpui-boards-core"
 version = "0.1.0"
-source = "git+https://github.com/XPUI-Framework/xpui-boards?branch=main#1c1c2cb5063e3d65fb46bf2c45ce992936d49f73"
+source = "git+https://github.com/XPUI-Framework/xpui-boards?branch=main#b87ecffdd0cb7b6975c322b8ad2d6ea22868f718"
 dependencies = [
  "xpui",
 ]
@@ -370,7 +370,7 @@ dependencies = [
 [[package]]
 name = "xpui-boards-pimoroni"
 version = "0.1.0"
-source = "git+https://github.com/XPUI-Framework/xpui-boards?branch=main#1c1c2cb5063e3d65fb46bf2c45ce992936d49f73"
+source = "git+https://github.com/XPUI-Framework/xpui-boards?branch=main#b87ecffdd0cb7b6975c322b8ad2d6ea22868f718"
 dependencies = [
  "xpui",
  "xpui-boards-core",
@@ -379,7 +379,7 @@ dependencies = [
 [[package]]
 name = "xpui-boards-seeed"
 version = "0.1.0"
-source = "git+https://github.com/XPUI-Framework/xpui-boards?branch=main#1c1c2cb5063e3d65fb46bf2c45ce992936d49f73"
+source = "git+https://github.com/XPUI-Framework/xpui-boards?branch=main#b87ecffdd0cb7b6975c322b8ad2d6ea22868f718"
 dependencies = [
  "xpui",
  "xpui-boards-core",
@@ -388,7 +388,7 @@ dependencies = [
 [[package]]
 name = "xpui-boards-xteink"
 version = "0.1.0"
-source = "git+https://github.com/XPUI-Framework/xpui-boards?branch=main#1c1c2cb5063e3d65fb46bf2c45ce992936d49f73"
+source = "git+https://github.com/XPUI-Framework/xpui-boards?branch=main#b87ecffdd0cb7b6975c322b8ad2d6ea22868f718"
 dependencies = [
  "xpui",
  "xpui-boards-core",
