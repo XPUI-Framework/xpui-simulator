@@ -397,7 +397,7 @@ dependencies = [
 [[package]]
 name = "xpui-chrome"
 version = "0.1.0"
-source = "git+https://github.com/XPUI-Framework/xpui-chrome?branch=main#951cb0333a7616b74fc210ceb15506c3a55a422c"
+source = "git+https://github.com/XPUI-Framework/xpui-chrome?branch=main#2dae85999fe3e245ee62ff1d708e568951ba0e16"
 dependencies = [
  "xpui",
 ]
@@ -405,7 +405,7 @@ dependencies = [
 [[package]]
 name = "xpui-embedded-graphics"
 version = "0.1.0"
-source = "git+https://github.com/XPUI-Framework/xpui-backends?branch=main#1d9d72a902db46aaa6c22031768f82870a465d49"
+source = "git+https://github.com/XPUI-Framework/xpui-backends?branch=main#d71de2094ae310e2157e38f4031b40d480eb2fdf"
 dependencies = [
  "embedded-graphics",
  "u8g2-fonts",
@@ -416,7 +416,7 @@ dependencies = [
 [[package]]
 name = "xpui-screenshot"
 version = "0.1.0"
-source = "git+https://github.com/XPUI-Framework/xpui-backends?branch=main#1d9d72a902db46aaa6c22031768f82870a465d49"
+source = "git+https://github.com/XPUI-Framework/xpui-backends?branch=main#d71de2094ae310e2157e38f4031b40d480eb2fdf"
 dependencies = [
  "embedded-graphics",
  "png",
